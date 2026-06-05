@@ -1,0 +1,137 @@
+/* ==========================================================================
+   MentorLink — footer.css
+   Pied de page : marque + réseaux sociaux, liens rapides, contact,
+   et mention de copyright.
+   ========================================================================== */
+
+.footer {
+  position: relative;
+  padding: clamp(3.5rem, 6vw, 5rem) var(--gutter) 2rem;
+  display: grid;
+  grid-template-columns: 1.6fr 1fr 1fr;
+  gap: clamp(2rem, 5vw, 4rem);
+  max-width: var(--container);
+  margin: 0 auto;
+}
+
+/* Fond + bordure pleine largeur (le contenu reste centré) */
+.footer::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100vw;
+  background: #060912;
+  border-top: 1px solid var(--border);
+  z-index: -1;
+}
+
+/* --- Bloc marque -------------------------------------------------------- */
+.footer-brand { max-width: 360px; }
+
+.footer-brand img { margin-bottom: 0.8rem; }
+
+.footer-title {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.5rem;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.7rem;
+}
+
+.footer-title::after { content: "."; color: var(--cyan); }
+
+.footer-descrition,
+.footer-description {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  line-height: 1.65;
+  margin-bottom: 1.4rem;
+}
+
+/* Réseaux sociaux */
+.footer-social {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+.social-link {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  transition: transform 0.25s ease, border-color 0.25s ease, background 0.25s ease;
+}
+
+.social-link img {
+  width: 18px;
+  height: 18px;
+  /* Rend les icônes SVG noires en blanc cassé */
+  filter: brightness(0) invert(0.85);
+  transition: filter 0.25s ease;
+}
+
+.social-link:hover {
+  transform: translateY(-3px);
+  border-color: var(--primary-400);
+  background: var(--surface-hover);
+}
+
+.social-link:hover img { filter: brightness(0) invert(1); }
+
+/* --- Colonnes de liens -------------------------------------------------- */
+.footer-heading {
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 1.2rem;
+}
+
+.footer-link {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.footer-link li { color: var(--text-muted); font-size: 0.95rem; }
+
+.footer-link a {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  transition: color 0.2s ease, padding-left 0.2s ease;
+}
+
+.footer-link a:hover {
+  color: var(--cyan-300);
+  padding-left: 4px;
+}
+
+/* --- Copyright ---------------------------------------------------------- */
+.footer-copy {
+  grid-column: 1 / -1;
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+  text-align: center;
+  color: var(--text-dim);
+  font-size: 0.88rem;
+}
+
+/* --- Responsive --------------------------------------------------------- */
+@media (max-width: 760px) {
+  .footer { grid-template-columns: 1fr 1fr; }
+  .footer-brand { grid-column: 1 / -1; }
+}
+
+@media (max-width: 480px) {
+  .footer { grid-template-columns: 1fr; }
+}
