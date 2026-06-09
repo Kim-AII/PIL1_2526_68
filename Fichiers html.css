@@ -1,0 +1,262 @@
+/* edit_profile.css - Styles pour la page de matching */
+
+/* --- Indicateur d'étapes (Steps) --- */
+.step-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 3rem;
+}
+
+.step-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--color-text-variant);
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: color 0.3s ease;
+}
+
+.step-item.active { color: var(--color-primary-container); }
+.step-item.done { color: #10b981; }
+
+.step-circle {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 2px solid currentColor;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.85rem;
+    background-color: var(--color-surface);
+    transition: all 0.3s ease;
+}
+
+.step-item.active .step-circle { background-color: var(--color-primary-fixed); }
+.step-item.done .step-circle { background-color: #d1fae5; border-color: #10b981; }
+
+.step-line {
+    width: 40px;
+    height: 2px;
+    background-color: var(--color-outline-variant);
+}
+
+/* --- Champs de formulaire --- */
+.input-custom {
+    background-color: #f8f9fa;
+    border: 1px solid var(--color-outline-variant);
+    border-radius: 0.75rem;
+    padding: 0.85rem 1rem;
+    color: var(--color-text-main);
+    transition: all 0.2s ease;
+}
+
+.input-custom:focus {
+    outline: none;
+    border-color: var(--color-primary-container);
+    box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.15);
+    background-color: #ffffff;
+}
+
+/* --- Checkboxes personnalisées (Lacunes) --- */
+.checkbox-card {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background-color: #f8f9fa;
+    border: 1px solid var(--color-outline-variant);
+    border-radius: 0.75rem;
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    user-select: none;
+}
+
+.checkbox-card:hover {
+    border-color: var(--color-primary-container);
+    background-color: var(--color-primary-fixed);
+}
+
+.checkbox-card input[type="checkbox"] { display: none; }
+
+.cb-box {
+    width: 20px;
+    height: 20px;
+    border-radius: 6px;
+    border: 2px solid var(--color-text-variant);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    color: transparent;
+    transition: all 0.2s ease;
+}
+
+.checkbox-card input:checked ~ .cb-box {
+    background-color: var(--color-primary-container);
+    border-color: var(--color-primary-container);
+    color: #ffffff;
+}
+
+.checkbox-card input:checked ~ .cb-label {
+    color: var(--color-primary-container);
+    font-weight: 600;
+}
+
+.cb-label {
+    font-size: 0.9rem;
+    color: var(--color-text-main);
+    font-weight: 500;
+}
+
+/* --- Chips de Disponibilité --- */
+.chip-btn {
+    display: inline-flex;
+    align-items: center;
+    background-color: #f8f9fa;
+    border: 1px solid var(--color-outline-variant);
+    border-radius: 50px;
+    padding: 0.5rem 1.25rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--color-text-variant);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    user-select: none;
+}
+
+.chip-btn:hover { border-color: var(--color-secondary); }
+
+.chip-btn.selected {
+    background-color: var(--color-primary-container);
+    border-color: var(--color-primary-container);
+    color: #ffffff;
+}
+
+.chip-btn input { display: none; }
+
+/* --- Barre de chargement animée --- */
+.loading-progress {
+    height: 8px;
+    background-color: var(--color-surface-variant);
+    border-radius: 50px;
+    overflow: hidden;
+    max-width: 300px;
+    margin: 0 auto;
+}
+
+.loading-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--color-primary-container), var(--color-secondary));
+    border-radius: 50px;
+    animation: loadBar 1.8s ease forwards;
+}
+
+@keyframes loadBar {
+    from { width: 0%; }
+    to { width: 100%; }
+}
+
+/* --- Cartes des Mentors (Résultats) --- */
+.mentor-card {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-outline-variant);
+    border-radius: 1.25rem;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.mentor-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.08);
+    border-color: var(--color-primary-container);
+}
+
+.mentor-card.top-match {
+    border-color: #eab308;
+    box-shadow: 0 0 0 2px rgba(234, 179, 8, 0.2), 0 10px 30px rgba(0,0,0,0.05);
+}
+
+.mentor-avatar {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #ffffff;
+    position: relative;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.rank-badge {
+    position: absolute;
+    bottom: -5px;
+    right: -5px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background-color: var(--color-surface);
+    border: 2px solid var(--color-outline-variant);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.top-match .rank-badge {
+    background-color: #eab308;
+    color: #ffffff;
+    border-color: #ffffff;
+}
+
+/* Cercle du score */
+.score-circle {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    background: conic-gradient(var(--color-primary-container) var(--pct, 0deg), #f1f5f9 0deg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.score-circle::before {
+    content: '';
+    position: absolute;
+    inset: 6px;
+    border-radius: 50%;
+    background-color: #ffffff;
+}
+
+.score-value {
+    position: relative;
+    z-index: 1;
+    font-weight: 800;
+    font-size: 1.1rem;
+    color: var(--color-primary-container);
+}
+
+.top-match .score-circle { background: conic-gradient(#eab308 var(--pct, 0deg), #f1f5f9 0deg); }
+.top-match .score-value { color: #eab308; }
+
+.badge-tag {
+    font-size: 0.75rem;
+    padding: 0.35rem 0.75rem;
+    border-radius: 50px;
+    font-weight: 600;
+}
+
+.tag-match { background-color: #dcfce7; color: #166534; }
+.tag-time { background-color: #f3e8ff; color: #6b21a8; }

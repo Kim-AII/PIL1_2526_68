@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Trouver un Mentor - IFRI MentorLink</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL,GRAD,opsz@400,1,0,24&display=swap" rel="stylesheet" />
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <link href="base.css" rel="stylesheet" />
+    <link href="edit_profile.css" rel="stylesheet" />
+</head>
+
+<body class="bg-surface d-flex flex-column min-vh-100">
+
+    <main class="container py-5 flex-grow-1">
+        
+        <header class="text-center mb-5">
+            <span class="badge bg-primary-fixed text-primary-container rounded-pill px-3 py-2 mb-3 fw-bold">
+                <span class="material-symbols-outlined align-middle" style="font-size: 16px;">robot_2</span> 
+                Matching IA
+            </span>
+            <h1 class="fw-bold text-dark mb-3">Trouvez votre Mentor idéal</h1>
+            <p class="text-muted mx-auto" style="max-width: 600px;">
+                Notre algorithme analyse vos lacunes et vos disponibilités pour vous connecter instantanément avec les étudiants les plus qualifiés de l'IFRI.
+            </p>
+        </header>
+
+        <div class="step-container" id="steps">
+            <div class="step-item active" id="step-1">
+                <div class="step-circle">1</div>
+                <span>Votre Profil</span>
+            </div>
+            <div class="step-line"></div>
+            <div class="step-item" id="step-2">
+                <div class="step-circle">2</div>
+                <span>Analyse</span>
+            </div>
+            <div class="step-line"></div>
+            <div class="step-item" id="step-3">
+                <div class="step-circle">3</div>
+                <span>Résultats</span>
+            </div>
+        </div>
+
+        <section id="form-section">
+            <div class="pro-max-card p-4 p-md-5 mx-auto" style="max-width: 750px;">
+                
+                <h3 class="h6 fw-bold text-dark mb-3 d-flex align-items-center gap-2">
+                    <span class="material-symbols-outlined text-primary-container">person</span> Informations académiques
+                </h3>
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <label class="form-label small fw-bold text-muted text-uppercase">Nom complet</label>
+                        <input type="text" class="form-control input-custom" id="name" placeholder="Ex: Alexandre Etudiant" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small fw-bold text-muted text-uppercase">Filière</label>
+                        <select class="form-select input-custom shadow-none" id="filiere">
+                            <option value="">— Choisir une filière —</option>
+                            <option value="Informatique">Informatique (Génie Logiciel)</option>
+                            <option value="Sécurité">Sécurité Informatique</option>
+                            <option value="Réseaux">Réseaux et Télécoms</option>
+                            <option value="IA">Intelligence Artificielle</option>
+                        </select>
+                    </div>
+                </div>
+
+                <hr class="border-outline-variant my-4">
+
+                <h3 class="h6 fw-bold text-dark mb-3 d-flex align-items-center gap-2">
+                    <span class="material-symbols-outlined text-warning">school</span> Mes lacunes (Besoin d'aide)
+                </h3>
+                <div class="row g-3 mb-4" id="lacunes-grid">
+                    </div>
+
+                <hr class="border-outline-variant my-4">
+
+                <h3 class="h6 fw-bold text-dark mb-3 d-flex align-items-center gap-2">
+                    <span class="material-symbols-outlined text-success">schedule</span> Mes créneaux libres
+                </h3>
+                <div class="d-flex flex-wrap gap-2 mb-5" id="dispos-grid">
+                    </div>
+
+                <button class="btn btn-primary-custom w-100 py-3 fs-6 d-flex justify-content-center align-items-center gap-2 shadow-hover" onclick="handleSubmit()">
+                    <span class="material-symbols-outlined">magic_button</span> Lancer le Matching
+                </button>
+            </div>
+        </section>
+
+        <section id="loading-section" class="d-none text-center py-5">
+            <div class="spinner-border text-primary-container mb-4" style="width: 4rem; height: 4rem; border-width: 4px;" role="status"></div>
+            <h3 class="fw-bold text-dark mb-2">Analyse en cours...</h3>
+            <p class="text-muted mb-4">Recherche du binôme parfait parmi nos mentors actifs.</p>
+            <div class="loading-progress">
+                <div class="loading-fill" id="progress-fill"></div>
+            </div>
+        </section>
+
+        <section id="results-section" class="d-none mx-auto" style="max-width: 900px;">
+            <div class="text-center mb-5">
+                <h2 class="fw-bold text-dark">Vos Mentors Recommandés</h2>
+                <p class="text-muted">Classés par affinité académique et disponibilité.</p>
+                <div class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-2 mt-2" id="student-recap"></div>
+            </div>
+            
+            <div class="row g-4" id="cards-grid">
+                </div>
+
+            <div class="text-center mt-5">
+                <button class="btn btn-outline-primary-custom rounded-pill" onclick="resetForm()">
+                    <span class="material-symbols-outlined align-middle me-1" style="font-size: 18px;">refresh</span> Refaire une recherche
+                </button>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="mt-auto py-4 border-top" style="background-color: var(--color-footer-bg, #0f172a); border-color: var(--color-footer-border, #1e293b) !important;">
+        <div class="container text-center text-muted" style="font-size: 0.85rem;">
+            © 2026 IFRI MentorLink. Propulsé par IA de matching.
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.css"></script>
+    <script src="edit_profile.js"></script>
+</body>
+</html>
