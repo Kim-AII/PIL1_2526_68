@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IFRI_MENTORLINK — Connexion</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Fond décoratif avec les cercles -->
+    <div class="fond-decoration">
+        <div class="cercle1"></div>
+        <div class="cercle2"></div>
+    </div>
+
+    <!-- Carte principale -->
+    <div class="conteneur">
+
+        <!-- En-tête -->
+        <div class="entete">
+            <h1>IFRI_MENTORLINK</h1>
+        </div>
+
+        <!-- Onglets Connexion / Inscription -->
+        <div class="onglets">
+            <button class="onglet actif" onclick="basculer('connexion')">Connexion</button>
+            <button class="onglet" onclick="basculer('inscription')">Inscription</button>
+        </div>
+
+        <!-- Corps du formulaire -->
+        <div class="corps">
+
+            <!-- ===== FORMULAIRE DE CONNEXION ===== -->
+            <div id="connexion" class="section-formulaire active">
+
+                <!-- Message d'erreur -->
+                <div class="message-erreur" id="erreur-connexion">
+                     Email ou mot de passe incorrect. Réessaie.
+                </div>
+
+                <!-- Champ Email -->
+                <div class="groupe-champ">
+                    <label>Adresse email</label>
+                    <div class="champ-avec-icone">
+                        <input type="email" id="email-connexion" placeholder="ton.email@.">
+                    </div>
+                </div>
+
+                <!-- Champ Mot de passe -->
+                <div class="groupe-champ">
+                    <label>Mot de passe</label>
+                    <div class="champ-avec-icone">
+                        <input type="password" id="mdp-connexion" placeholder="••••••••">
+                    </div>
+                </div>
+
+                <!-- Lien mot de passe oublié -->
+                <div class="lien-oubli">
+                    <a href="#">Mot de passe oublié ?</a>
+                </div>
+
+                <!-- Bouton de connexion -->
+                <button class="bouton-principal" onclick="connecter()">
+                    Se connecter
+                </button>
+
+            </div>
+
+            <!-- ===== FORMULAIRE D'INSCRIPTION ===== -->
+            <div id="inscription" class="section-formulaire">
+
+                <!-- Nom et Prénom -->
+                <div class="ligne-double">
+                    <div class="groupe-champ">
+                        <label>Nom</label>
+                        <div class="champ-avec-icone">
+                            <input type="text" id="nom" placeholder="Ton nom">
+                        </div>
+                    </div>
+                    <div class="groupe-champ">
+                        <label>Prénom</label>
+                        <div class="champ-avec-icone">
+                            <input type="text" id="prenom" placeholder="Ton prénom">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Email -->
+                <div class="groupe-champ">
+                    <label>Adresse email</label>
+                    <div class="champ-avec-icone">
+                        <input type="email" id="email-inscription" placeholder="ton.email@">
+                    </div>
+                </div>
+
+                <!-- Téléphone -->
+                <div class="groupe-champ">
+                    <label>Numéro de téléphone</label>
+                    <div class="champ-avec-icone">
+                        <input type="tel" id="telephone" placeholder="+229 XX XX XX XX">
+                    </div>
+                </div>
+
+                <!-- Filière -->
+                <div class="groupe-champ">
+                    <label>Filière</label>
+                    <div class="champ-avec-icone">
+                        <select id="filiere">
+                            <option value="">Choisir une filière</option>
+                            <option value="GL">Génie Logiciel</option>
+                            <option value="SI">Securité informatique</option>
+                            <option value="SEOIT">Systèmes Embarqué et Internet des Objet</option>
+                            <option value="IA">Intelligence Artificielle</option>
+                             <option value="IA">Internet et Multimedia</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Niveau et Mot de passe côte à côte -->
+                <div class="ligne-double">
+                    <div class="groupe-champ">
+                        <label>Niveau</label>
+                        <div class="champ-avec-icone">
+                            <select id="niveau">
+                                <option value="">Niveau</option>
+                                <option value="L1">Licence 1</option>
+                                <option value="L2">Licence 2</option>
+                                <option value="L3">Licence 3</option>
+                                <option value="M1">Master 1</option>
+                                <option value="M2">Master 2</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="groupe-champ">
+                        <label>Mot de passe</label>
+                        <div class="champ-avec-icone">
+                            <input type="password" id="mdp-inscription" placeholder="••••••">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Disponibilité -->
+                <div class="groupe-champ">
+                    <label>Disponibilité</label>
+                    <div class="champ-avec-icone">
+                        <input type="text" id="disponibilite" placeholder="Ex : Lundi-Vendredi, 14h-18h">
+                    </div>
+                </div>
+
+                <!-- Statut -->
+                <div class="groupe-champ">
+                    <label>Statut</label>
+                    <div class="champ-avec-icone">
+                        <select id="statut">
+                            <option value="">Choisir un statut</option>
+                            <option value="mentor">Mentor</option>
+                            <option value="mentore">Mentoré</option>
+                            <option value="les-deux">Les deux</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Bouton d'inscription -->
+                <button class="bouton-principal" onclick="inscrire()">
+                    Créer mon compte
+                </button>
+
+            </div>
+
+        </div>
+
+        <!-- Pied de la carte -->
+        <div class="pied-carte">
+            <a href="#">← Retour page d'accueil</a>
+            <div class="separateur-pied"></div>
+            <a href="condit_utili.html">Guide d'utilisation</a>
+            <div class="separateur-pied"></div>
+            <a href="confidentialite.html">Confidentialité</a>
+        </div>
+
+    </div>
+
+    <script src="script.js"></script>
+
+</body>
+</html>
