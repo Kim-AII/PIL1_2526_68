@@ -8,7 +8,7 @@ class Config:
     # Connexion MySQL — modifier selon votre environnement
     SQLALCHEMY_DATABASE_URI = os.environ.get(
         'DATABASE_URL',
-        'mysql+pymysql://root:MdpMysql@localhost/mentorlink_db'
+        'mysql+pymysql://root:@localhost/mentorlink_db'
     )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     JSON_ENSURE_ASCII = False
