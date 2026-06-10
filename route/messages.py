@@ -366,3 +366,30 @@ def _mes_conversations():
         (Conversation.user1_id == current_user.id) |
         (Conversation.user2_id == current_user.id)
     ).order_by(Conversation.date_creation.desc()).all()
+import socket 
+import threading 
+IP=0.0.0.0
+PORT=55555
+clients =socket.socket(socket.AF_NET , socket.SOCK_STREAM)
+client.connect (IP ,PORT)
+pseudo = input("Veuillez entrer votre pseudo")
+client.send(bytes(message,"utf-8"))
+def envoyer_message ():
+while True :
+message = input ()
+client.send(bytes(message , "utf-8"))
+if message == "exit"
+break
+def recevoir_message():
+while True
+try
+
+message = client.rcv(1024).decode("utf-8")
+print("message")
+
+except 
+break
+thread.envoi = threading.thread(target = "envoyer_message")
+thread.reception = threading.thread (target= "recevoir_message")
+thread_envoi.start()
+thread_reception.start()
