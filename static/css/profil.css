@@ -1,0 +1,409 @@
+/* ==========================================================================
+   MentorLink — profil.css
+   Page « Mon profil » (hérite de base.html).
+   Les tokens (--bg, --surf, --primary, --cyan, --gradient, --text, --sub…)
+   proviennent de base.html : on ne les redéfinit pas ici.
+   Vert = points forts / succès, Rouge = lacunes / erreurs (sémantique).
+   ========================================================================== */
+
+/* --- Grille générale ---------------------------------------------------- */
+.profil-grid {
+  display: grid;
+  grid-template-columns: 1.7fr 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+.profil-grid > div {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* --- Carte ------------------------------------------------------------- */
+.p-card {
+  background: linear-gradient(165deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.015));
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.p-head {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 1.1rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+}
+.p-head::before {
+  content: "";
+  width: 4px;
+  height: 18px;
+  border-radius: 4px;
+  background: var(--gradient);
+  flex-shrink: 0;
+}
+.p-head h3 {
+  font-family: var(--hf);
+  font-size: 1.02rem;
+  font-weight: 700;
+}
+.p-body { padding: 1.5rem; }
+
+/* --- Champs de formulaire ---------------------------------------------- */
+.f-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+.f-field {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1.1rem;
+}
+.f-field label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--sub);
+  margin-bottom: 0.4rem;
+  letter-spacing: 0.03em;
+}
+.f-field label .opt { font-weight: 400; color: var(--dim); }
+
+.f-field input,
+.f-field select,
+.f-field textarea,
+.comp-add-row select,
+.dispo-form select,
+.dispo-form input {
+  width: 100%;
+  padding: 0.72rem 1rem;
+  background: rgba(7, 11, 22, 0.55);
+  border: 1px solid var(--border-strong);
+  border-radius: 10px;
+  color: var(--text);
+  font-family: var(--bf);
+  font-size: 0.9rem;
+  outline: none;
+  color-scheme: dark;
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+}
+.f-field input::placeholder,
+.f-field textarea::placeholder { color: var(--dim); }
+
+.f-field input:focus,
+.f-field select:focus,
+.f-field textarea:focus,
+.comp-add-row select:focus,
+.dispo-form select:focus,
+.dispo-form input:focus {
+  border-color: var(--primary-400);
+  background: rgba(7, 11, 22, 0.85);
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.18);
+}
+
+.f-field textarea {
+  min-height: 92px;
+  resize: vertical;
+  line-height: 1.6;
+}
+
+/* Flèche personnalisée des selects */
+.f-field select,
+.comp-add-row select,
+.dispo-form select {
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%239aa6c0' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  padding-right: 2.5rem;
+}
+.f-field select option,
+.comp-add-row select option,
+.dispo-form select option { background: var(--surf-2); color: var(--text); }
+
+/* Bouton enregistrer */
+.btn-save {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.4rem;
+  padding: 0.8rem 1.4rem;
+  background: var(--gradient);
+  color: #06121f;
+  font-family: var(--bf);
+  font-weight: 700;
+  font-size: 0.92rem;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  box-shadow: 0 12px 30px -12px rgba(34, 211, 238, 0.55);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.btn-save:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 36px -12px rgba(34, 211, 238, 0.7);
+}
+
+/* --- Compétences : onglets --------------------------------------------- */
+.comp-toggle {
+  display: inline-flex;
+  gap: 4px;
+  padding: 4px;
+  margin-bottom: 1.25rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+.ct-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.5rem 0.95rem;
+  border: none;
+  background: none;
+  color: var(--sub);
+  font-family: var(--bf);
+  font-weight: 600;
+  font-size: 0.85rem;
+  border-radius: 9px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+.ct-btn:hover { color: var(--text); }
+.ct-btn.active-g { background: rgba(22, 224, 127, 0.14); color: var(--success); }
+.ct-btn.active-r { background: rgba(248, 113, 113, 0.14); color: #fca5a5; }
+
+/* --- Compétences : tags ------------------------------------------------ */
+.comp-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.1rem;
+  min-height: 1.5rem;
+}
+.comp-empty { font-size: 0.8rem; color: var(--sub); }
+
+.comp-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.38rem 0.4rem 0.38rem 0.85rem;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  border: 1px solid;
+}
+.comp-tag button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.08);
+  color: inherit;
+  cursor: pointer;
+  font-size: 0.72rem;
+  line-height: 1;
+  transition: background 0.2s;
+}
+.comp-tag button:hover { background: rgba(255, 255, 255, 0.2); }
+.comp-tag-g { background: rgba(22, 224, 127, 0.1); border-color: rgba(22, 224, 127, 0.3); color: #6ee7a8; }
+.comp-tag-r { background: rgba(248, 113, 113, 0.1); border-color: rgba(248, 113, 113, 0.3); color: #fca5a5; }
+
+/* Ligne d'ajout */
+.comp-add-row {
+  display: flex;
+  gap: 0.6rem;
+}
+.comp-add-row select { flex: 1; }
+.btn-add-g,
+.btn-add-r {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.6rem 1rem;
+  border: 1px solid;
+  border-radius: 10px;
+  font-family: var(--bf);
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.2s;
+}
+.btn-add-g { background: rgba(22, 224, 127, 0.12); border-color: rgba(22, 224, 127, 0.3); color: var(--success); }
+.btn-add-g:hover { background: rgba(22, 224, 127, 0.2); }
+.btn-add-r { background: rgba(248, 113, 113, 0.12); border-color: rgba(248, 113, 113, 0.3); color: #fca5a5; }
+.btn-add-r:hover { background: rgba(248, 113, 113, 0.2); }
+
+/* --- Carte avatar ------------------------------------------------------ */
+.ava-card {
+  position: relative;
+  overflow: hidden;
+  padding: 1.9rem 1.5rem;
+  text-align: center;
+  background: linear-gradient(165deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.015));
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+.ava-card::before {
+  content: "";
+  position: absolute;
+  top: -55%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 240px;
+  height: 240px;
+  background: var(--gradient-soft);
+  filter: blur(55px);
+  pointer-events: none;
+}
+.ava-circle {
+  position: relative;
+  width: 84px;
+  height: 84px;
+  margin: 0 auto 1rem;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-family: var(--hf);
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #06121f;
+  background: var(--gradient);
+  box-shadow: 0 12px 32px -10px rgba(34, 211, 238, 0.6);
+}
+.ava-name { position: relative; font-family: var(--hf); font-size: 1.15rem; font-weight: 700; }
+.ava-sub { position: relative; font-size: 0.85rem; color: var(--sub); margin-top: 0.2rem; word-break: break-word; }
+.ava-chips {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.4rem;
+  margin-top: 1.1rem;
+}
+.chip {
+  padding: 0.32rem 0.8rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border);
+  color: var(--sub);
+}
+.chip-g { background: var(--accent-soft); border-color: rgba(34, 211, 238, 0.3); color: var(--cyan-300); }
+
+/* --- Disponibilités ---------------------------------------------------- */
+.dispo-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  margin-bottom: 1.25rem;
+}
+.dispo-empty { font-size: 0.8rem; color: var(--sub); text-align: center; padding: 0.5rem 0; }
+.dispo-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.7rem 1rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  transition: border-color 0.2s;
+}
+.dispo-item:hover { border-color: var(--border-strong); }
+.dispo-info { display: flex; align-items: center; gap: 0.8rem; }
+.dispo-jour { font-weight: 600; font-size: 0.88rem; }
+.dispo-time { font-size: 0.82rem; color: var(--sub); }
+.btn-rm {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  background: none;
+  color: var(--dim);
+  cursor: pointer;
+  font-size: 0.82rem;
+  transition: color 0.2s, background 0.2s;
+}
+.btn-rm:hover { color: var(--danger); background: rgba(248, 113, 113, 0.1); }
+
+/* Formulaire d'ajout de disponibilité */
+.dispo-form {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr auto;
+  gap: 0.7rem;
+  align-items: end;
+  padding-top: 1.1rem;
+  border-top: 1px solid var(--border);
+}
+.dispo-form label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--sub);
+  margin-bottom: 0.3rem;
+}
+.dispo-form select,
+.dispo-form input { padding: 0.62rem 0.8rem; font-size: 0.85rem; }
+.dispo-form select { padding-right: 2rem; background-position: right 0.7rem center; }
+.btn-add-dispo {
+  padding: 0.64rem 1rem;
+  background: var(--accent-soft);
+  border: 1px solid rgba(34, 211, 238, 0.3);
+  color: var(--cyan-300);
+  border-radius: 9px;
+  font-family: var(--bf);
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.2s;
+}
+.btn-add-dispo:hover { background: rgba(34, 211, 238, 0.2); }
+
+/* --- Toast ------------------------------------------------------------- */
+.toast {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translate(-50%, 20px);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.8rem 1.3rem;
+  border-radius: 12px;
+  border: 1px solid;
+  font-size: 0.88rem;
+  font-weight: 600;
+  box-shadow: var(--shadow);
+  -webkit-backdrop-filter: blur(10px);
+          backdrop-filter: blur(10px);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s, transform 0.3s, visibility 0.3s;
+}
+.toast.show { opacity: 1; visibility: visible; transform: translate(-50%, 0); }
+.toast-ok  { background: rgba(22, 224, 127, 0.14); border-color: rgba(22, 224, 127, 0.35); color: #6ee7a8; }
+.toast-err { background: rgba(248, 113, 113, 0.14); border-color: rgba(248, 113, 113, 0.35); color: #fca5a5; }
+
+/* --- Responsive -------------------------------------------------------- */
+@media (max-width: 980px) {
+  .profil-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 560px) {
+  .f-row { grid-template-columns: 1fr; }
+  .dispo-form { grid-template-columns: 1fr 1fr; }
+  .comp-add-row { flex-direction: column; }
+  .comp-add-row .btn-add-g,
+  .comp-add-row .btn-add-r { justify-content: center; }
+}

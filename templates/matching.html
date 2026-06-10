@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+{% block title %}Matching — IFRI MentorLink{% endblock %}
+{% block page_title %}Matching{% endblock %}
+
+{% block topbar_actions %}
+  <span style="font-size:.82rem;color:var(--sub)">
+    {{ suggestions | length }} mentor{{ 's' if suggestions | length > 1 else '' }} trouvé{{ 's' if suggestions | length > 1 else '' }}
+  </span>
+{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/matching.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="match-toolbar">
+  <div class="search-wrap">
+    <span class="search-icon"><i class="fa-solid fa-magnifying-glass"></i></span>
+    <input type="text" id="search-inp" placeholder="Rechercher par nom…" oninput="filterCards()" />
+  </div>
+  <div class="filter-btns">
+    <button class="fbtn active" data-fil="" onclick="setFil(this,'')">Tous</button>
+    {% for f in ['IA','IM','GL','SE_IoT','SI'] %}
+      <button class="fbtn" data-fil="{{ f }}" onclick="setFil(this,'{{ f }}')">{{ f.replace('_','&') }}</button>
+    {% endfor %}
+  </div>
+</div>
+
+<div class="match-grid" id="match-grid">
+  {% if suggestions %}
+    {% for s in suggestions %}
+      {% set ava_cls = ['ava-0','ava-1','ava-2','ava-3'][loop.index0 % 4] %}
+      {% set score = s.score %}
+      {% if score >= 80 %}{% set rc='#16e07f' %}{% set rb='#0c2a1c' %}
+      {% elif score >= 60 %}{% set rc='#fbbf24' %}{% set rb='#2a2410' %}
+      {% else %}{% set rc='#f87171' %}{% set rb='#2d1414' %}{% endif %}
+      {% set circ = 125.6 %}{% set dash = (score / 100 * circ)|round(1) %}
+
+      <div class="match-card" data-name="{{ s.user.prenom }} {{ s.user.nom }}" data-fil="{{ s.user.filiere or '' }}">
+        <div class="mc-top">
+          <div class="mc-ava {{ ava_cls }}">{{ s.user.prenom[0]|upper }}{{ s.user.nom[0]|upper }}</div>
+          <div class="mc-info">
+            <div class="mc-name">{{ s.user.prenom }} {{ s.user.nom }}</div>
+            <div class="mc-meta">{{ s.user.filiere or '—' }} · Niveau {{ s.user.niveau or '—' }}</div>
+            {% if s.user.filiere %}<span class="mc-fil">{{ s.user.filiere.replace('_','&') }}</span>{% endif %}
+          </div>
+          <svg width="60" height="60" viewBox="0 0 60 60">
+            <circle cx="30" cy="30" r="20" fill="{{ rb }}" stroke="{{ rb }}" stroke-width="6"/>
+            <circle cx="30" cy="30" r="20" fill="none" stroke="#1c2a44" stroke-width="4"/>
+            <circle cx="30" cy="30" r="20" fill="none" stroke="{{ rc }}" stroke-width="4"
+                    stroke-dasharray="{{ dash }} {{ circ }}" stroke-dashoffset="31.4"
+                    stroke-linecap="round" transform="rotate(-90 30 30)"/>
+            <text x="30" y="27" text-anchor="middle" font-size="10" fill="{{ rc }}"
+                  font-weight="800" font-family="Sora, sans-serif">{{ score }}%</text>
+            <text x="30" y="37" text-anchor="middle" font-size="7" fill="#9aa6c0"
+                  font-family="'Plus Jakarta Sans', sans-serif">match</text>
+          </svg>
+        </div>
+
+        <div>
+          <div class="mc-section-lbl">Compétences en commun</div>
+          <div class="mc-tags">
+            {% if s.competences_communes %}
+              {% for c in s.competences_communes[:5] %}
+                <span class="tag {{ ['tag-g','tag-b','tag-p'][loop.index0%3] }}">{{ c.nom }}</span>
+              {% endfor %}
+              {% if s.competences_communes|length > 5 %}
+                <span class="tag tag-more">+{{ s.competences_communes|length - 5 }}</span>
+              {% endif %}
+            {% else %}
+              <span class="tag-none">Aucune compétence commune</span>
+            {% endif %}
+          </div>
+        </div>
+
+        {% if s.disponibilites_communes %}
+          <div>
+            <div class="mc-section-lbl">Créneaux disponibles</div>
+            <div class="mc-dispos">
+              {% for d in s.disponibilites_communes[:3] %}
+                <span class="dispo-chip">{{ d.jour }} {{ d.heure_debut[:5] }}–{{ d.heure_fin[:5] }}</span>
+              {% endfor %}
+              {% if s.disponibilites_communes|length > 3 %}
+                <span class="dispo-chip">+{{ s.disponibilites_communes|length - 3 }}</span>
+              {% endif %}
+            </div>
+          </div>
+        {% endif %}
+
+        <div class="mc-actions">
+          <a href="{{ url_for('messages.page_messages', user=s.user.id) }}" class="btn-contact-lg"><i class="fa-solid fa-comment-dots"></i> Contacter</a>
+          <button class="btn-score-detail" onclick="openProfile({{ s.user.id }}, {{ score }})">Voir le profil</button>
+        </div>
+      </div>
+    {% endfor %}
+  {% else %}
+    <div class="empty-match">
+      <span class="em"><i class="fa-solid fa-magnifying-glass"></i></span>
+      <h3>Aucun match pour l'instant</h3>
+      <p>Complétez votre profil avec des <a href="{{ url_for('users.profil') }}">compétences et disponibilités</a> pour obtenir des suggestions.</p>
+    </div>
+  {% endif %}
+</div>
+
+<div class="modal-overlay" id="profile-modal" onclick="if(event.target===this)closeProfile()">
+  <div class="modal-box">
+    <button class="pm-close" onclick="closeProfile()" aria-label="Fermer"><i class="fa-solid fa-xmark"></i></button>
+    <div id="profile-body"></div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/matching.js') }}"></script>
+{% endblock %}

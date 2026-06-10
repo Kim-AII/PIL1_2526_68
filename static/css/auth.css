@@ -1,0 +1,243 @@
+/* ==========================================================================
+   MentorLink — auth.css
+   Styles partagés des pages d'authentification (carte centrée) :
+   mot de passe oublié, connexion, inscription.
+   Tokens alignés sur la page d'accueil (base.css) et sur base.html.
+   ========================================================================== */
+
+/* --- Reset -------------------------------------------------------------- */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+/* --- Tokens (harmonisés) ------------------------------------------------ */
+:root {
+  --bg:            #070b16;
+  --surf:          #0b1322;
+  --surf-2:        #121d31;
+  --border:        rgba(255, 255, 255, 0.09);
+  --border-strong: rgba(255, 255, 255, 0.16);
+
+  --text: #eef2fb;
+  --sub:  #9aa6c0;
+  --dim:  #66718c;
+
+  --primary:     #3b82f6;
+  --primary-400: #60a5fa;
+  --cyan:        #22d3ee;
+  --cyan-300:    #5ee7f5;
+  --gradient:    linear-gradient(135deg, #3b82f6 0%, #22d3ee 100%);
+
+  --success: #16e07f;
+  --danger:  #f87171;
+  --warning: #fbbf24;
+  --info:    #60a5fa;
+
+  --radius:    16px;
+  --radius-lg: 22px;
+  --shadow:    0 30px 70px -30px rgba(0, 0, 0, 0.8);
+
+  --hf: 'Sora', system-ui, sans-serif;
+  --bf: 'Plus Jakarta Sans', system-ui, sans-serif;
+}
+
+html, body { height: 100%; }
+
+body {
+  font-family: var(--bf);
+  background: var(--bg);
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 2rem;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Atmosphère de fond (lueurs subtiles) */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(55% 45% at 20% 10%, rgba(59, 130, 246, 0.16), transparent 60%),
+    radial-gradient(50% 45% at 85% 90%, rgba(34, 211, 238, 0.12), transparent 60%);
+}
+
+::selection { background: rgba(34, 211, 238, 0.3); color: #fff; }
+
+a:focus-visible, button:focus-visible, input:focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: 2px;
+}
+
+/* --- Carte -------------------------------------------------------------- */
+.box {
+  position: relative;
+  width: 100%;
+  max-width: 420px;
+  background: linear-gradient(165deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.015));
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 2.5rem;
+  box-shadow: var(--shadow);
+  -webkit-backdrop-filter: blur(14px);
+          backdrop-filter: blur(14px);
+  overflow: hidden;
+  animation: box-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Lueur décorative dans un coin */
+.box::before {
+  content: "";
+  position: absolute;
+  top: -45%;
+  right: -25%;
+  width: 280px;
+  height: 280px;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.22), rgba(34, 211, 238, 0.22));
+  filter: blur(60px);
+  pointer-events: none;
+}
+
+.box > * { position: relative; }
+
+@keyframes box-in {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* --- Logo --------------------------------------------------------------- */
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 2rem;
+}
+
+.logo-pip {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--cyan);
+  box-shadow: 0 0 10px var(--cyan);
+}
+
+.logo-txt {
+  font-family: var(--hf);
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  text-decoration: none;
+  color: var(--text);
+}
+
+/* --- Titres ------------------------------------------------------------- */
+h2 {
+  font-family: var(--hf);
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.45rem;
+}
+
+.sub {
+  font-size: 0.9rem;
+  color: var(--sub);
+  margin-bottom: 2rem;
+  line-height: 1.65;
+}
+
+/* --- Messages flash (couleurs sémantiques conservées) ------------------- */
+.flash {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.7rem 1rem;
+  border-radius: 10px;
+  border: 1px solid;
+  font-size: 0.85rem;
+  margin-bottom: 1rem;
+}
+.flash i { flex-shrink: 0; }
+.flash-info    { background: rgba(96, 165, 250, 0.08); border-color: rgba(96, 165, 250, 0.25); color: var(--info); }
+.flash-danger  { background: rgba(248, 113, 113, 0.08); border-color: rgba(248, 113, 113, 0.25); color: #fca5a5; }
+.flash-success { background: rgba(22, 224, 127, 0.08);  border-color: rgba(22, 224, 127, 0.25);  color: var(--success); }
+.flash-warning { background: rgba(251, 191, 36, 0.08);  border-color: rgba(251, 191, 36, 0.25);  color: var(--warning); }
+
+/* --- Formulaire --------------------------------------------------------- */
+label {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--sub);
+  margin-bottom: 0.4rem;
+  letter-spacing: 0.03em;
+}
+
+input {
+  width: 100%;
+  padding: 0.78rem 1rem;
+  background: rgba(7, 11, 22, 0.6);
+  border: 1px solid var(--border-strong);
+  border-radius: 10px;
+  color: var(--text);
+  font-family: var(--bf);
+  font-size: 0.92rem;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+  margin-bottom: 1.25rem;
+}
+
+input::placeholder { color: var(--dim); }
+
+input:focus {
+  border-color: var(--primary-400);
+  background: rgba(7, 11, 22, 0.85);
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.18);
+}
+
+/* --- Bouton ------------------------------------------------------------- */
+.btn-submit {
+  width: 100%;
+  padding: 0.85rem;
+  background: var(--gradient);
+  color: #06121f;
+  font-family: var(--bf);
+  font-size: 0.95rem;
+  font-weight: 700;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 12px 30px -12px rgba(34, 211, 238, 0.6);
+}
+
+.btn-submit:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 16px 36px -12px rgba(34, 211, 238, 0.7);
+}
+
+/* --- Lien de retour ----------------------------------------------------- */
+.back {
+  display: block;
+  text-align: center;
+  margin-top: 1.4rem;
+  font-size: 0.85rem;
+  color: var(--sub);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.back:hover { color: var(--cyan-300); }
+
+/* --- Responsive --------------------------------------------------------- */
+@media (max-width: 460px) {
+  body { padding: 1.25rem; }
+  .box { padding: 2rem 1.5rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}

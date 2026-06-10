@@ -1,0 +1,265 @@
+/* ==========================================================================
+   MentorLink — base.css
+   Système de design global : variables, reset, typographie,
+   boutons, conteneur, atmosphère de fond et animations partagées.
+   ========================================================================== */
+
+/* --- Variables de thème ------------------------------------------------- */
+:root {
+  /* Fonds */
+  --bg:            #070b16;                 /* fond principal très sombre */
+  --bg-soft:       #0a1020;                 /* sections alternées */
+  --surface:       rgba(255, 255, 255, 0.04);
+  --surface-hover: rgba(255, 255, 255, 0.07);
+  --border:        rgba(255, 255, 255, 0.09);
+  --border-strong: rgba(255, 255, 255, 0.16);
+
+  /* Texte */
+  --text:        #eef2fb;
+  --text-muted:  #9aa6c0;
+  --text-dim:    #66718c;
+
+  /* Couleurs de marque */
+  --primary:     #3b82f6;
+  --primary-600: #2563eb;
+  --primary-400: #60a5fa;
+  --cyan:        #22d3ee;
+  --cyan-300:    #5ee7f5;
+
+  /* Dégradés */
+  --gradient:      linear-gradient(135deg, #3b82f6 0%, #22d3ee 100%);
+  --gradient-text: linear-gradient(120deg, #60a5fa 0%, #22d3ee 100%);
+  --gradient-soft: linear-gradient(135deg, rgba(59, 130, 246, 0.16), rgba(34, 211, 238, 0.16));
+
+  /* Typographie */
+  --font-display: "Sora", system-ui, sans-serif;
+  --font-body:    "Plus Jakarta Sans", system-ui, sans-serif;
+
+  /* Mise en page */
+  --container: 1200px;
+  --gutter:    24px;
+
+  /* Arrondis */
+  --radius-sm: 12px;
+  --radius:    18px;
+  --radius-lg: 26px;
+  --radius-pill: 999px;
+
+  /* Ombres & lueurs */
+  --shadow:      0 24px 60px -28px rgba(0, 0, 0, 0.7);
+  --shadow-card: 0 18px 40px -24px rgba(0, 0, 0, 0.65);
+  --glow:        0 0 50px rgba(59, 130, 246, 0.35);
+
+  /* Header */
+  --header-h: 76px;
+}
+
+/* --- Reset -------------------------------------------------------------- */
+*,
+*::before,
+*::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: calc(var(--header-h) + 16px);
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.65;
+  font-size: 16px;
+  letter-spacing: 0.01em;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+img,
+svg,
+video { display: block; max-width: 100%; }
+
+a { color: inherit; text-decoration: none; }
+
+ul { list-style: none; }
+
+button,
+input,
+select,
+textarea { font: inherit; color: inherit; }
+
+::selection { background: rgba(34, 211, 238, 0.3); color: #fff; }
+
+/* --- Atmosphère de fond (lueurs + grille subtile) ----------------------- */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  background:
+    radial-gradient(60% 50% at 15% 0%, rgba(59, 130, 246, 0.18), transparent 60%),
+    radial-gradient(55% 45% at 100% 20%, rgba(34, 211, 238, 0.12), transparent 60%),
+    radial-gradient(50% 50% at 50% 100%, rgba(37, 99, 235, 0.10), transparent 65%);
+  pointer-events: none;
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+  background-size: 64px 64px;
+  -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 30%, #000 40%, transparent 100%);
+          mask-image: radial-gradient(ellipse 80% 60% at 50% 30%, #000 40%, transparent 100%);
+  pointer-events: none;
+}
+
+/* --- Conteneur ---------------------------------------------------------- */
+.container {
+  width: 100%;
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+}
+
+/* --- Section : rythme vertical ----------------------------------------- */
+.section {
+  padding: clamp(4.5rem, 9vw, 8rem) 0;
+  position: relative;
+}
+
+/* --- Typographie utilitaire -------------------------------------------- */
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  font-weight: 700;
+}
+
+.gradient-text,
+.highlight {
+  background: var(--gradient-text);
+  -webkit-background-clip: text;
+          background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+/* Étiquette de section (ex. « SERVICES ») */
+.section-label,
+.subtitle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--cyan-300);
+}
+
+.section-label::before,
+.subtitle::before {
+  content: "";
+  width: 26px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--gradient);
+}
+
+.section-label--cyan { color: var(--cyan-300); }
+
+/* En-tête de section centré (Services, Comment ça marche) */
+.section__head {
+  max-width: 680px;
+  margin: 0 auto clamp(2.5rem, 5vw, 4rem);
+  text-align: center;
+}
+
+.section__title {
+  font-size: clamp(1.9rem, 4.2vw, 3rem);
+  margin: 1rem 0 0.9rem;
+}
+
+.section__intro {
+  color: var(--text-muted);
+  font-size: 1.05rem;
+  max-width: 56ch;
+  margin: 0 auto;
+}
+
+/* --- Boutons ------------------------------------------------------------ */
+.btn-primary,
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  padding: 0.9rem 1.6rem;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 0.98rem;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: transform 0.25s ease, box-shadow 0.25s ease,
+              background 0.25s ease, border-color 0.25s ease;
+  white-space: nowrap;
+}
+
+.btn-primary {
+  background: var(--gradient);
+  color: #06121f;
+  box-shadow: 0 12px 30px -12px rgba(34, 211, 238, 0.6);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 18px 40px -12px rgba(34, 211, 238, 0.7);
+}
+
+.btn-ghost {
+  background: var(--surface);
+  border-color: var(--border-strong);
+  color: var(--text);
+  -webkit-backdrop-filter: blur(8px);
+          backdrop-filter: blur(8px);
+}
+
+.btn-ghost:hover {
+  transform: translateY(-2px);
+  background: var(--surface-hover);
+  border-color: var(--primary-400);
+}
+
+/* --- Animations de révélation au défilement ----------------------------- */
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(26px);
+  transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+              transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+[data-reveal].is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* Délais en cascade pour les éléments d'une même grille */
+[data-reveal][data-delay="1"] { transition-delay: 0.08s; }
+[data-reveal][data-delay="2"] { transition-delay: 0.16s; }
+[data-reveal][data-delay="3"] { transition-delay: 0.24s; }
+[data-reveal][data-delay="4"] { transition-delay: 0.32s; }
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+  html { scroll-behavior: auto; }
+  [data-reveal] { opacity: 1; transform: none; }
+}

@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% block title %}Messagerie — IFRI MentorLink{% endblock %}
+{% block page_title %}Messagerie{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/messages.css') }}">
+{% endblock %}
+
+{% block content %}
+
+<!-- ══ LISTE CONVERSATIONS ══ -->
+<div class="conv-panel">
+  <div class="conv-search-wrap">
+    <input type="text" class="conv-search" placeholder="Rechercher…" oninput="filterConvs(this.value)" />
+  </div>
+  <div class="conv-list" id="conv-list">
+    {% if conversations %}
+      {% for conv in conversations %}
+        {% set autre = conv.autre_participant(current_user.id) %}
+        {% set last_msg = conv.messages[-1] if conv.messages else none %}
+        <div class="conv-item"
+             id="conv-item-{{ conv.id }}"
+             data-user-id="{{ autre.id }}"
+             data-name="{{ autre.prenom }} {{ autre.nom }}"
+             onclick="openConv({{ autre.id }}, '{{ autre.prenom }} {{ autre.nom }}', '{{ autre.filiere or '' }}', '{{ autre.niveau or '' }}')">
+          <div class="conv-ava">{{ autre.prenom[0]|upper }}{{ autre.nom[0]|upper }}</div>
+          <div class="conv-info">
+            <div class="conv-name">{{ autre.prenom }} {{ autre.nom }}</div>
+            <div class="conv-prev">
+              {% if last_msg %}
+                {% if last_msg.user_id == current_user.id %}Vous : {% endif %}
+                {{ last_msg.contenu[:40] }}{% if last_msg.contenu|length > 40 %}…{% endif %}
+              {% else %}
+                Nouvelle conversation
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    {% else %}
+      <div class="conv-empty-state">
+        Aucune conversation.<br>
+        Contactez un mentor via la page <a href="{{ url_for('matching.page_matching') }}">Matching</a>.
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- ══ FENÊTRE CHAT ══ -->
+<div class="chat-panel" id="chat-panel">
+
+  <!-- Placeholder initial -->
+  <div class="chat-placeholder" id="chat-placeholder">
+    <span class="ph-icon"><i class="fa-solid fa-comments"></i></span>
+    <h3>Sélectionnez une conversation</h3>
+    <p>Choisissez un contact à gauche pour commencer à discuter,<br>ou trouvez un mentor via la page Matching.</p>
+  </div>
+
+  <!-- Zone chat (cachée jusqu'à sélection) -->
+  <div id="chat-active" style="display:none;flex:1;flex-direction:column;overflow:hidden;">
+    <!-- Header -->
+    <div class="chat-header">
+      <div class="chat-hava" id="chat-hava">—</div>
+      <div class="chat-hinfo">
+        <div class="chat-hname" id="chat-hname">—</div>
+        <div class="chat-hmeta" id="chat-hmeta">—</div>
+      </div>
+      <div class="online-dot" title="En ligne"></div>
+    </div>
+    <!-- Messages -->
+    <div class="chat-messages" id="chat-messages"></div>
+    <!-- Input -->
+    <div class="chat-input-area">
+      <textarea class="chat-input" id="chat-input"
+                placeholder="Écrivez votre message…"
+                rows="1"
+                onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg();}"
+                oninput="autoResize(this)"></textarea>
+      <button class="btn-send" id="btn-send" onclick="sendMsg()" title="Envoyer"><i class="fa-solid fa-paper-plane"></i></button>
+    </div>
+  </div>
+
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+  /* Injecté depuis Jinja2 — utilisé par messages.js */
+  window.CURRENT_USER_ID = {{ current_user.id }};
+</script>
+<script src="{{ url_for('static', filename='js/messages.js') }}"></script>
+{% endblock %}

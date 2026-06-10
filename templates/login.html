@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Connexion — IFRI MentorLink</title>
+
+  <!-- Polices harmonisées -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Sora:wght@700;800&display=swap" rel="stylesheet" />
+
+  <!-- Icônes -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+
+  <!-- Styles séparés -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}" />
+</head>
+<body>
+
+<!-- ═══════════ PANNEAU GAUCHE ═══════════ -->
+<div class="panel-left">
+  <div class="lp-inner">
+    <a href="{{ url_for('main.index') }}" class="lp-logo">
+      <div class="lp-pip"></div>
+      IFRI MentorLink
+    </a>
+
+    <h2 class="lp-title">Progressez avec les <span class="gr">meilleurs de votre promo</span></h2>
+    <p class="lp-sub">Connectez-vous à des mentors dans votre filière, disponibles selon vos horaires.</p>
+
+    <ul class="feat-list">
+      <li class="feat-item"><div class="feat-pip"></div>Matching automatique par compétences</li>
+      <li class="feat-item"><div class="feat-pip"></div>Compatibilité horaires &amp; filière</li>
+      <li class="feat-item"><div class="feat-pip"></div>Messagerie intégrée &amp; historique</li>
+      <li class="feat-item"><div class="feat-pip"></div>IA · IM · GL · SE&amp;IoT · SI</li>
+    </ul>
+
+    <div class="lp-card">
+      <div class="lp-ava">AS</div>
+      <div class="lp-card-info">
+        <div class="lp-card-name">Aminata Sow</div>
+        <div class="lp-card-meta">IA · L3 — Python, ML, SQL</div>
+      </div>
+      <div class="lp-card-score">92%</div>
+    </div>
+
+    <div class="lp-bottom">
+      UAC — IFRI · PIL1 2025/2026<br>
+      <a href="{{ url_for('main.index') }}">← Retour à l'accueil</a>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ FORMULAIRE ═══════════ -->
+<div class="panel-right">
+  <div class="form-box">
+
+    <div class="form-head">
+      <h2>Bon retour </h2>
+      <p>Pas encore de compte ? <a href="{{ url_for('auth.register') }}">S'inscrire gratuitement</a></p>
+    </div>
+
+    <!-- Messages flash -->
+    {% with messages = get_flashed_messages(with_categories=True) %}
+      {% if messages %}
+        {% set flash_icons = {
+          'success': 'fa-circle-check',
+          'danger':  'fa-circle-xmark',
+          'warning': 'fa-triangle-exclamation',
+          'info':    'fa-circle-info'
+        } %}
+        {% for category, message in messages %}
+          <div class="flash flash-{{ category }}">
+            <i class="fa-solid {{ flash_icons.get(category, 'fa-circle-info') }}"></i> {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <form method="POST" action="{{ url_for('auth.login') }}" novalidate>
+
+      <div class="field">
+        <label for="identifiant">Email ou numéro de téléphone</label>
+        <input
+          type="text" id="identifiant" name="identifiant"
+          placeholder="user@ifri.uac.bj ou +22960000000"
+          required autocomplete="username"
+          value="{{ request.form.get('identifiant', '') }}"
+        />
+      </div>
+
+      <div class="field">
+        <label for="mot_de_passe">Mot de passe</label>
+        <div class="pw-wrap">
+          <input
+            type="password" id="mot_de_passe" name="mot_de_passe"
+            placeholder="Votre mot de passe"
+            required autocomplete="current-password"
+          />
+          <button type="button" class="pw-eye" onclick="togglePw('mot_de_passe', this)"
+                  aria-label="Afficher le mot de passe">
+            <i class="fa-solid fa-eye"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="check-row">
+        <label class="check-lbl">
+          <input type="checkbox" name="remember_me" />
+          Se souvenir de moi
+        </label>
+        <a href="{{ url_for('auth.reset_password') }}" class="forgot-link">
+          Mot de passe oublié ?
+        </a>
+      </div>
+
+      <button type="submit" class="btn-submit">Se connecter →</button>
+    </form>
+  </div>
+</div>
+
+<script>
+  function togglePw(id, btn) {
+    const inp = document.getElementById(id);
+    const icon = btn.querySelector('i');
+    const shown = inp.type === 'text';
+    inp.type = shown ? 'password' : 'text';
+    icon.classList.toggle('fa-eye', shown);
+    icon.classList.toggle('fa-eye-slash', !shown);
+    btn.setAttribute('aria-label', shown ? 'Afficher le mot de passe' : 'Masquer le mot de passe');
+  }
+</script>
+</body>
+</html>

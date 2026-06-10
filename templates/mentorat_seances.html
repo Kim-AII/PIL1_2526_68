@@ -1,0 +1,390 @@
+{% extends 'base.html' %}
+{% block title %}Mes séances — IFRI MentorLink{% endblock %}
+{% block page_title %}Mes séances de mentorat{% endblock %}
+
+{% block topbar_actions %}
+  <a href="{{ url_for('mentorat.page_mentorat') }}" class="btn btn-ghost">
+    <i class="fa-solid fa-arrow-left"></i> Retour aux offres
+  </a>
+{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/mentorat.css') }}">
+{% endblock %}
+
+{% block content %}
+
+{% macro statut_cls(s) %}{% if s == 'planifiee' %}planifiee{% elif s == 'confirmee' %}confirmee{% elif s == 'terminee' %}terminee{% else %}annulee{% endif %}{% endmacro %}
+{% macro statut_lbl(s) %}{% if s == 'planifiee' %}Planifiée{% elif s == 'confirmee' %}Confirmée{% elif s == 'terminee' %}Terminée{% else %}Annulée{% endif %}{% endmacro %}
+{% macro role_lbl(seance) %}{% if seance.mentor_id == current_user.id %}Mentor{% else %}Mentoré{% endif %}{% endmacro %}
+{% macro autre_user(seance) %}{% if seance.mentor_id == current_user.id %}{{ seance.mentore }}{% else %}{{ seance.mentor }}{% endif %}{% endmacro %}
+
+<div class="seances-grid">
+
+  <!-- ── Séances à venir ── -->
+  <div class="seances-section">
+    <h3>
+      <i class="fa-solid fa-calendar-check" style="color:var(--cyan-300)"></i>
+      Séances à venir
+      {% if seances_avenir %}<span>{{ seances_avenir | length }}</span>{% endif %}
+    </h3>
+
+    {% if seances_avenir %}
+      {% for s in seances_avenir %}
+        {% if s.mentor_id == current_user.id %}
+          {% set autre = s.mentore %}
+          {% set mon_role = 'Mentor' %}
+          {% set role_color = 'var(--cyan-300)' %}
+        {% else %}
+          {% set autre = s.mentor %}
+          {% set mon_role = 'Mentoré' %}
+          {% set role_color = '#c084fc' %}
+        {% endif %}
+
+        <div class="seance-card" id="seance-{{ s.id }}">
+          <div class="sc-head">
+            <div class="sc-ava">
+              {{ autre.prenom[0]|upper }}{{ autre.nom[0]|upper }}
+            </div>
+            <div class="sc-info">
+              <div class="sc-titre">{{ s.offre.titre }}</div>
+              <div class="sc-role">
+                Avec <strong>{{ autre.prenom }} {{ autre.nom }}</strong> ·
+                <span style="color:{{ role_color }}">{{ mon_role }}</span>
+              </div>
+            </div>
+            <span class="sc-statut {{ s.statut }}">{{ statut_lbl(s.statut) }}</span>
+          </div>
+
+          <div class="sc-details">
+            {% if s.date_seance %}
+              <span class="sc-chip">
+                <i class="fa-solid fa-calendar"></i>
+                {{ s.date_seance.strftime('%d/%m/%Y') }}
+              </span>
+              <span class="sc-chip">
+                <i class="fa-solid fa-clock"></i>
+                {{ s.date_seance.strftime('%H:%M') }}
+              </span>
+            {% else %}
+              <span class="sc-chip" style="color:var(--warning)">
+                <i class="fa-solid fa-triangle-exclamation"></i> Date à planifier
+              </span>
+            {% endif %}
+
+            {% if s.duree_minutes %}
+              <span class="sc-chip">
+                <i class="fa-solid fa-hourglass-half"></i> {{ s.duree_minutes }} min
+              </span>
+            {% endif %}
+
+            {% if s.lieu %}
+              <span class="sc-chip">
+                <i class="fa-solid fa-location-dot"></i> {{ s.lieu }}
+              </span>
+            {% endif %}
+          </div>
+
+          {% if s.notes %}
+            <div style="font-size:.8rem;color:var(--sub);line-height:1.5;
+                        background:var(--surf);border-radius:8px;padding:.6rem .8rem;
+                        border:1px solid var(--border)">
+              <i class="fa-solid fa-note-sticky" style="color:var(--cyan-300)"></i>
+              {{ s.notes }}
+            </div>
+          {% endif %}
+
+          <div class="sc-actions">
+            <!-- Planifier / modifier la date -->
+            <button class="sc-btn" onclick="openPlanifier({{ s.id }}, '{{ s.date_seance.isoformat() if s.date_seance else '' }}', '{{ s.lieu or '' }}', {{ s.duree_minutes }})">
+              <i class="fa-solid fa-calendar-pen"></i> Planifier
+            </button>
+
+            <!-- Confirmer (accessible aux deux participants) -->
+            {% if s.statut == 'planifiee' %}
+              <button class="sc-btn confirm" onclick="updateSeance({{ s.id }}, 'confirmee')">
+                <i class="fa-solid fa-check"></i> Confirmer
+              </button>
+            {% endif %}
+
+            <!-- Terminer -->
+            {% if s.statut in ['planifiee', 'confirmee'] %}
+              <button class="sc-btn finish" onclick="openNotes({{ s.id }})">
+                <i class="fa-solid fa-flag-checkered"></i> Terminer
+              </button>
+            {% endif %}
+
+            <!-- Annuler -->
+            {% if s.statut in ['planifiee', 'confirmee'] %}
+              <button class="sc-btn cancel" onclick="updateSeance({{ s.id }}, 'annulee')">
+                <i class="fa-solid fa-xmark"></i> Annuler
+              </button>
+            {% endif %}
+          </div>
+        </div>
+      {% endfor %}
+
+    {% else %}
+      <div class="empty-ment" style="padding:2.5rem 1rem">
+        <span class="em-ico"><i class="fa-solid fa-calendar-xmark"></i></span>
+        <h3>Aucune séance à venir</h3>
+        <p>Postulez à des offres ou publiez vos propres offres pour planifier des séances.<br>
+          <a href="{{ url_for('mentorat.page_mentorat') }}">Voir les publications →</a>
+        </p>
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- ── Historique ── -->
+  <div class="seances-section">
+    <h3>
+      <i class="fa-solid fa-clock-rotate-left" style="color:var(--sub)"></i>
+      Historique
+      {% if seances_passees %}<span>{{ seances_passees | length }}</span>{% endif %}
+    </h3>
+
+    {% if seances_passees %}
+      {% for s in seances_passees %}
+        {% if s.mentor_id == current_user.id %}
+          {% set autre = s.mentore %}
+          {% set mon_role = 'Mentor' %}
+        {% else %}
+          {% set autre = s.mentor %}
+          {% set mon_role = 'Mentoré' %}
+        {% endif %}
+
+        <div class="seance-card">
+          <div class="sc-head">
+            <div class="sc-ava" style="opacity:.6">
+              {{ autre.prenom[0]|upper }}{{ autre.nom[0]|upper }}
+            </div>
+            <div class="sc-info">
+              <div class="sc-titre" style="opacity:.8">{{ s.offre.titre }}</div>
+              <div class="sc-role" style="opacity:.7">
+                Avec <strong>{{ autre.prenom }} {{ autre.nom }}</strong> · {{ mon_role }}
+              </div>
+            </div>
+            <span class="sc-statut {{ s.statut }}">{{ statut_lbl(s.statut) }}</span>
+          </div>
+
+          <div class="sc-details">
+            {% if s.date_seance %}
+              <span class="sc-chip">
+                <i class="fa-solid fa-calendar"></i>
+                {{ s.date_seance.strftime('%d/%m/%Y') }}
+              </span>
+              <span class="sc-chip">
+                <i class="fa-solid fa-hourglass-half"></i> {{ s.duree_minutes }} min
+              </span>
+            {% endif %}
+            {% if s.lieu %}
+              <span class="sc-chip">
+                <i class="fa-solid fa-location-dot"></i> {{ s.lieu }}
+              </span>
+            {% endif %}
+          </div>
+
+          {% if s.notes %}
+            <div style="font-size:.78rem;color:var(--dim);line-height:1.5;
+                        background:var(--surf);border-radius:8px;padding:.55rem .75rem;
+                        border:1px solid var(--border)">
+              <i class="fa-solid fa-note-sticky" style="color:var(--dim)"></i>
+              {{ s.notes }}
+            </div>
+          {% endif %}
+        </div>
+      {% endfor %}
+
+    {% else %}
+      <div class="empty-ment" style="padding:2.5rem 1rem">
+        <span class="em-ico"><i class="fa-solid fa-box-archive"></i></span>
+        <h3>Aucun historique</h3>
+        <p>Vos séances terminées apparaîtront ici.</p>
+      </div>
+    {% endif %}
+  </div>
+
+</div>
+
+
+<!-- ════════════════════════════════════════════════
+     MODALE — Planifier / modifier date & lieu
+════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="modal-planifier">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closePlanifier()" aria-label="Fermer">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+    <div class="modal-title">
+      <i class="fa-solid fa-calendar-pen" style="color:var(--cyan-300)"></i>
+      Planifier la séance
+    </div>
+    <form id="form-planifier" class="seance-form" onsubmit="submitPlanifier(event)">
+      <div class="form-group">
+        <label class="form-label" for="plan-date">Date et heure</label>
+        <input type="datetime-local" id="plan-date" name="date_seance" class="form-input">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" for="plan-duree">Durée (minutes)</label>
+          <input type="number" id="plan-duree" name="duree_minutes" class="form-input"
+                 value="60" min="15" max="360">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="plan-lieu">Lieu / lien</label>
+          <input type="text" id="plan-lieu" name="lieu" class="form-input"
+                 placeholder="Salle B204 ou lien Zoom…">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-cancel-modal" onclick="closePlanifier()">Annuler</button>
+        <button type="submit" class="btn-submit-modal" id="btn-submit-plan">
+          <i class="fa-solid fa-floppy-disk"></i> Enregistrer
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════
+     MODALE — Terminer la séance (avec notes)
+════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="modal-notes">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeNotes()" aria-label="Fermer">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+    <div class="modal-title">
+      <i class="fa-solid fa-flag-checkered" style="color:var(--success)"></i>
+      Terminer la séance
+    </div>
+    <form id="form-notes" onsubmit="submitNotes(event)">
+      <div class="form-group">
+        <label class="form-label" for="notes-txt">Notes / compte-rendu (optionnel)</label>
+        <textarea id="notes-txt" name="notes" class="form-textarea"
+                  placeholder="Résumé de ce qui a été abordé, points à améliorer…"></textarea>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-cancel-modal" onclick="closeNotes()">Annuler</button>
+        <button type="submit" class="btn-submit-modal" id="btn-submit-notes"
+                style="background:linear-gradient(135deg,#16e07f,#22d3ee)">
+          <i class="fa-solid fa-flag-checkered"></i> Marquer terminée
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+// ── Planifier ──
+let currentSeanceId = null;
+
+function openPlanifier(id, date, lieu, duree) {
+  currentSeanceId = id;
+  if (date) document.getElementById('plan-date').value = date.slice(0,16);
+  document.getElementById('plan-lieu').value  = lieu  || '';
+  document.getElementById('plan-duree').value = duree || 60;
+  document.getElementById('modal-planifier').classList.add('open');
+}
+function closePlanifier() {
+  document.getElementById('modal-planifier').classList.remove('open');
+}
+async function submitPlanifier(e) {
+  e.preventDefault();
+  const btn   = document.getElementById('btn-submit-plan');
+  const data  = {
+    date_seance:   document.getElementById('plan-date').value  || null,
+    lieu:          document.getElementById('plan-lieu').value  || null,
+    duree_minutes: parseInt(document.getElementById('plan-duree').value) || 60
+  };
+  btn.disabled = true; btn.textContent = 'Enregistrement…';
+  try {
+    const res = await fetch(`/api/mentorat/seances/${currentSeanceId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    if (!res.ok) throw new Error((await res.json()).erreur || 'Erreur');
+    showToastS('Séance planifiée !', 'success');
+    closePlanifier();
+    setTimeout(() => location.reload(), 800);
+  } catch(err) { showToastS(err.message, 'error'); }
+  finally { btn.disabled = false; btn.textContent = 'Enregistrer'; }
+}
+
+// ── Notes / Terminer ──
+function openNotes(id) {
+  currentSeanceId = id;
+  document.getElementById('notes-txt').value = '';
+  document.getElementById('modal-notes').classList.add('open');
+}
+function closeNotes() {
+  document.getElementById('modal-notes').classList.remove('open');
+}
+async function submitNotes(e) {
+  e.preventDefault();
+  const btn   = document.getElementById('btn-submit-notes');
+  const notes = document.getElementById('notes-txt').value.trim();
+  btn.disabled = true;
+  try {
+    const res = await fetch(`/api/mentorat/seances/${currentSeanceId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ statut: 'terminee', notes: notes || null })
+    });
+    if (!res.ok) throw new Error((await res.json()).erreur || 'Erreur');
+    showToastS('Séance marquée terminée !', 'success');
+    closeNotes();
+    setTimeout(() => location.reload(), 800);
+  } catch(err) { showToastS(err.message, 'error'); }
+  finally { btn.disabled = false; }
+}
+
+// ── Mettre à jour statut (confirmer / annuler) ──
+async function updateSeance(id, statut) {
+  const labels = { confirmee: 'Confirmer', annulee: 'Annuler' };
+  const confirm_msg = statut === 'annulee' ? 'Annuler cette séance ?' : null;
+  if (confirm_msg && !confirm(confirm_msg)) return;
+
+  try {
+    const res = await fetch(`/api/mentorat/seances/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ statut })
+    });
+    if (!res.ok) throw new Error((await res.json()).erreur || 'Erreur');
+    const msg = statut === 'confirmee' ? 'Séance confirmée !' : 'Séance annulée.';
+    showToastS(msg, statut === 'confirmee' ? 'success' : 'error');
+    setTimeout(() => location.reload(), 800);
+  } catch(err) { showToastS(err.message, 'error'); }
+}
+
+// ── Fermer modales overlay ──
+['modal-planifier','modal-notes'].forEach(id => {
+  const el = document.getElementById(id);
+  el && el.addEventListener('click', e => { if (e.target === el) el.classList.remove('open'); });
+});
+
+// ── Toast ──
+let _timer = null;
+function showToastS(msg, type) {
+  let t = document.getElementById('seance-toast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'seance-toast';
+    t.className = 'ment-toast';
+    document.body.appendChild(t);
+  }
+  const icon = type === 'success' ? '<i class="fa-solid fa-circle-check"></i>' : '<i class="fa-solid fa-circle-xmark"></i>';
+  t.innerHTML = icon + ' ' + msg;
+  t.className = `ment-toast ${type}`;
+  requestAnimationFrame(() => t.classList.add('show'));
+  clearTimeout(_timer);
+  _timer = setTimeout(() => t.classList.remove('show'), 3200);
+}
+</script>
+{% endblock %}

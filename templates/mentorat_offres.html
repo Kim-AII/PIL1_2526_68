@@ -1,0 +1,216 @@
+{% extends 'base.html' %}
+{% block title %}Mentorat — IFRI MentorLink{% endblock %}
+{% block page_title %}Offres &amp; Demandes de mentorat{% endblock %}
+
+{% block topbar_actions %}
+  <button class="btn btn-primary" onclick="openPublier()" id="btn-top-publier">
+    <i class="fa-solid fa-plus"></i> Publier
+  </button>
+{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/mentorat.css') }}">
+{% endblock %}
+
+{% block content %}
+
+<!-- ── Toolbar ── -->
+<div class="ment-toolbar">
+  <!-- Onglets -->
+  <div class="ment-tabs">
+    <button class="tab-btn active" data-tab="offre"  onclick="setTab('offre')">
+      <i class="fa-solid fa-chalkboard-user"></i> Offres
+    </button>
+    <button class="tab-btn"        data-tab="demande" onclick="setTab('demande')">
+      <i class="fa-solid fa-hand-raised"></i> Demandes
+    </button>
+    <button class="tab-btn"        data-tab="mes"     onclick="setTab('mes')">
+      <i class="fa-solid fa-folder-open"></i> Mes publications
+    </button>
+  </div>
+
+  <!-- Filtres -->
+  <div class="ment-filters" id="filters-wrap">
+    <select class="filter-select" id="fil-filiere" onchange="applyFilter('filiere', this.value)">
+      <option value="">Toutes filières</option>
+      {% for f in ['IA','IM','GL','SE_IoT','SI'] %}
+        <option value="{{ f }}">{{ f.replace('_','&') }}</option>
+      {% endfor %}
+    </select>
+
+    <select class="filter-select" id="fil-niveau" onchange="applyFilter('niveau', this.value)">
+      <option value="">Tous niveaux</option>
+      {% for n in ['L1','L2','L3','M1','M2'] %}
+        <option value="{{ n }}">{{ n }}</option>
+      {% endfor %}
+    </select>
+
+    <select class="filter-select" id="fil-comp" onchange="applyFilter('comp', this.value)">
+      <option value="">Toutes compétences</option>
+      {% for c in competences %}
+        <option value="{{ c.id }}">{{ c.nom }}</option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <!-- Bouton publier (visible sur mobile) -->
+  <button class="btn-publier" onclick="openPublier()" id="btn-toolbar-publier" style="display:none">
+    <i class="fa-solid fa-plus"></i> Publier
+  </button>
+</div>
+
+<!-- ── Section grille (offres/demandes disponibles) ── -->
+<div id="section-grid">
+  <div class="ment-grid" id="ment-grid">
+    <div class="ment-spinner">
+      <div class="spinner-ring"></div> Chargement…
+    </div>
+  </div>
+</div>
+
+<!-- ── Section mes publications ── -->
+<div id="section-mes" style="display:none">
+  <div id="mes-pubs-wrap">
+    <div class="ment-spinner">
+      <div class="spinner-ring"></div> Chargement…
+    </div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════
+     MODALE — Publier une offre / demande
+════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="modal-publier">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closePublier()" aria-label="Fermer">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+    <div class="modal-title"><i class="fa-solid fa-bullhorn" style="color:var(--cyan-300)"></i> Nouvelle publication</div>
+
+    <form id="form-publier" onsubmit="submitPublier(event)">
+      <!-- Type de publication -->
+      <div class="form-group">
+        <label class="form-label">Type de publication <span>*</span></label>
+        <div class="type-selector">
+          <label class="type-option">
+            <input type="radio" name="type_publication" value="offre" checked>
+            <div class="to-icon">🎓</div>
+            <div class="to-label">Offre de mentorat</div>
+            <div class="to-desc">Je propose mon aide sur un sujet</div>
+          </label>
+          <label class="type-option">
+            <input type="radio" name="type_publication" value="demande">
+            <div class="to-icon">🙋</div>
+            <div class="to-label">Demande de mentorat</div>
+            <div class="to-desc">Je cherche un mentor sur un sujet</div>
+          </label>
+        </div>
+      </div>
+
+      <!-- Titre -->
+      <div class="form-group">
+        <label class="form-label" for="pub-titre">Titre <span>*</span></label>
+        <input type="text" id="pub-titre" name="titre" class="form-input"
+               placeholder="Ex : Aide en Python pour L1, Cherche mentor en Algèbre…"
+               maxlength="150" required>
+      </div>
+
+      <!-- Description -->
+      <div class="form-group">
+        <label class="form-label" for="pub-desc">Description</label>
+        <textarea id="pub-desc" name="description" class="form-textarea"
+                  placeholder="Décrivez votre offre ou besoin en détail…"></textarea>
+      </div>
+
+      <!-- Compétence & Places -->
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" for="pub-comp">Compétence concernée</label>
+          <select id="pub-comp" name="competence_id" class="form-select">
+            <option value="">— Choisir —</option>
+            {% for c in competences %}
+              <option value="{{ c.id }}">{{ c.nom }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="pub-places">Nombre de places</label>
+          <input type="number" id="pub-places" name="max_places" class="form-input"
+                 value="1" min="1" max="20">
+        </div>
+      </div>
+
+      <!-- Filière cible & Niveau cible -->
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" for="pub-filiere">Filière ciblée</label>
+          <select id="pub-filiere" name="filiere_cible" class="form-select">
+            <option value="">Toutes</option>
+            {% for f in ['IA','IM','GL','SE_IoT','SI'] %}
+              <option value="{{ f }}">{{ f.replace('_','&') }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="pub-niveau">Niveau ciblé</label>
+          <select id="pub-niveau" name="niveau_cible" class="form-select">
+            <option value="">Tous</option>
+            {% for n in ['L1','L2','L3','M1','M2'] %}
+              <option value="{{ n }}">{{ n }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn-cancel-modal" onclick="closePublier()">Annuler</button>
+        <button type="submit" class="btn-submit-modal" id="btn-submit-pub">
+          <i class="fa-solid fa-bullhorn"></i> Publier
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════
+     MODALE — Postuler à une offre/demande
+════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="modal-postuler">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closePostuler()" aria-label="Fermer">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+    <div class="modal-title"><i class="fa-solid fa-paper-plane" style="color:var(--cyan-300)"></i> Postuler</div>
+
+    <div class="postulation-info" id="postul-info"></div>
+
+    <form id="form-postuler" onsubmit="submitPostuler(event)">
+      <div class="form-group">
+        <label class="form-label" for="postul-message">Message (optionnel)</label>
+        <textarea id="postul-message" name="message" class="form-textarea"
+                  placeholder="Présentez-vous brièvement, expliquez votre motivation…"></textarea>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-cancel-modal" onclick="closePostuler()">Annuler</button>
+        <button type="submit" class="btn-submit-modal" id="btn-submit-post">
+          <i class="fa-solid fa-paper-plane"></i> Envoyer ma candidature
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/mentorat.js') }}"></script>
+<script>
+  /* Masquer bouton toolbar sur desktop (topbar l'affiche déjà) */
+  if (window.innerWidth <= 768) {
+    document.getElementById('btn-toolbar-publier').style.display = 'inline-flex';
+    document.getElementById('btn-top-publier').style.display     = 'none';
+  }
+</script>
+{% endblock %}

@@ -1,0 +1,236 @@
+{% extends 'base.html' %}
+{% block title %}Tableau de bord — IFRI MentorLink{% endblock %}
+{% block page_title %}Tableau de bord{% endblock %}
+
+{% block topbar_actions %}
+  <a href="{{ url_for('matching.page_matching') }}" class="btn btn-primary">
+    Voir tous mes matchs →
+  </a>
+{% endblock %}
+
+{% block extra_css %}
+  {# Styles spécifiques au dashboard — voir static/css/dashboard.css #}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+{% endblock %}
+
+{% block content %}
+
+<!-- ── Salutation ── -->
+<div class="greeting">
+  <h2>Bonjour, {{ current_user.prenom }} </h2>
+  <p>Voici un aperçu de votre activité.</p>
+</div>
+
+<!-- ── 4 Stats cards ── -->
+<div class="stats-row">
+
+  <div class="stat-card">
+    <div class="stat-icon si-g"><i class="fa-solid fa-shuffle"></i></div>
+    <div>
+      <div class="stat-val v-g">{{ suggestions | length }}</div>
+      <div class="stat-lbl">Match{{ 's' if suggestions|length > 1 else '' }} suggéré{{ 's' if suggestions|length > 1 else '' }}</div>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-icon si-b"><i class="fa-solid fa-comment-dots"></i></div>
+    <div>
+      <div class="stat-val v-b" id="badge-msgs">{{ nb_messages }}</div>
+      <div class="stat-lbl">Message{{ 's' if nb_messages > 1 else '' }} non lu{{ 's' if nb_messages > 1 else '' }}</div>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-icon si-p"><i class="fa-solid fa-bolt"></i></div>
+    <div>
+      <div class="stat-val v-p">{{ nb_competences }}</div>
+      <div class="stat-lbl">Compétence{{ 's' if nb_competences > 1 else '' }}</div>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-icon si-a"><i class="fa-solid fa-calendar-check"></i></div>
+    <div>
+      <div class="stat-val v-a">{{ nb_seances }}</div>
+      <div class="stat-lbl">Séance{{ 's' if nb_seances > 1 else '' }} planifiée{{ 's' if nb_seances > 1 else '' }}</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ── Contenu principal ── -->
+<div class="dash-grid">
+
+  <!-- GAUCHE : Suggestions de matching -->
+  <div class="sec-card">
+    <div class="sec-head">
+      <h3>Suggestions de matching</h3>
+      <a href="{{ url_for('matching.page_matching') }}">Voir tout →</a>
+    </div>
+
+    {% if suggestions %}
+      {% set av = ['av0','av1','av2'] %}
+      {% for s in suggestions %}
+        {% set sc = s.score %}
+        {% set sc_cls = 'low' if sc < 60 else ('mid' if sc < 80 else '') %}
+        <div class="suggest-item">
+          <div class="s-ava {{ av[loop.index0 % 3] }}">
+            {{ s.user.prenom[0]|upper }}{{ s.user.nom[0]|upper }}
+          </div>
+          <div class="s-body">
+            <div class="s-name">{{ s.user.prenom }} {{ s.user.nom }}</div>
+            <div class="s-meta">{{ s.user.filiere or '—' }}{% if s.user.niveau %} · {{ s.user.niveau }}{% endif %}</div>
+            <div class="s-tags">
+              {% for c in s.competences_communes[:3] %}
+                <span class="tag-g">{{ c.nom }}</span>
+              {% endfor %}
+            </div>
+          </div>
+          <div class="s-right">
+            <span class="s-score {{ sc_cls }}">{{ sc }}%</span>
+           <a href="{{ url_for('messages.page_messages', user=s.user.id) }}" class="btn-contact"><i class="fa-solid fa-comment-dots"></i> Contacter</a>
+          </div>
+        </div>
+      {% endfor %}
+    {% else %}
+      <div class="empty-s">
+        <span class="em-ico"><i class="fa-solid fa-magnifying-glass"></i></span>
+        <p>Aucun match pour l'instant.<br>
+           <a href="{{ url_for('users.profil') }}">Complétez votre profil</a> pour des suggestions.</p>
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- DROITE : Profil + Conversations -->
+  <div class="right-col">
+
+    <!-- Complétion du profil -->
+    <div class="prof-card">
+      <h4>Complétion du profil</h4>
+      <p>Un profil complet améliore la qualité de vos matchs.</p>
+
+      <div class="progress-bar">
+        <div class="progress-fill" style="width: {{ completion }}%"></div>
+      </div>
+      <div class="prog-row">
+        <span>Progression</span>
+        <span>{{ completion }}%</span>
+      </div>
+
+      <div class="prof-checks">
+        <div class="pc-item {{ 'pc-ok' if current_user.nom else '' }}">
+          <div class="pc-dot"></div> Informations personnelles
+        </div>
+        <div class="pc-item {{ 'pc-ok' if current_user.filiere else '' }}">
+          <div class="pc-dot"></div> Filière &amp; niveau
+        </div>
+        <div class="pc-item {{ 'pc-ok' if current_user.bio else '' }}">
+          <div class="pc-dot"></div> Biographie
+        </div>
+        <div class="pc-item {{ 'pc-ok' if nb_competences > 0 else '' }}">
+          <div class="pc-dot"></div> Compétences ({{ nb_competences }})
+        </div>
+        <div class="pc-item {{ 'pc-ok' if current_user.disponibilites else '' }}">
+          <div class="pc-dot"></div> Disponibilités
+        </div>
+      </div>
+
+      {% if completion < 100 %}
+        <a href="{{ url_for('users.profil') }}" class="btn-complete">
+          Compléter mon profil →
+        </a>
+      {% endif %}
+    </div>
+
+    <!-- Conversations récentes -->
+    <div class="sec-card">
+      <div class="sec-head">
+        <h3>Conversations récentes</h3>
+        <a href="{{ url_for('messages.page_messages') }}">Voir tout →</a>
+      </div>
+
+      {% if convs_recentes %}
+        {% for conv in convs_recentes %}
+          {% set autre = conv.autre_participant(current_user.id) %}
+          {% set dernier = conv.messages[-1] if conv.messages else none %}
+          {% set non_lus = conv.messages | selectattr('user_id', '!=', current_user.id) | selectattr('lu', '==', false) | list | length %}
+          <a href="{{ url_for('messages.page_messages') }}" class="conv-item">
+            <div class="c-ava">
+              {{ autre.prenom[0]|upper }}{{ autre.nom[0]|upper }}
+            </div>
+            <div class="c-info">
+              <div class="c-name">{{ autre.prenom }} {{ autre.nom }}</div>
+              <div class="c-prev">
+                {% if dernier %}
+                  {{ dernier.contenu[:45] }}{% if dernier.contenu|length > 45 %}…{% endif %}
+                {% else %}
+                  Nouvelle conversation
+                {% endif %}
+              </div>
+            </div>
+            {% if non_lus > 0 %}
+              <div class="c-unread"></div>
+            {% endif %}
+          </a>
+        {% endfor %}
+      {% else %}
+        <div class="empty-s">
+          <span class="em-ico"><i class="fa-solid fa-comments"></i></span>
+          <p>Aucune conversation pour l'instant.<br>
+             Contactez un mentor pour commencer.</p>
+        </div>
+      {% endif %}
+    </div>
+
+  </div>
+</div>
+
+<!-- SECTION : Offres & Demandes de mentorat récentes -->
+{% if offres_recentes %}
+<div class="sec-card" style="margin-top:1.5rem">
+  <div class="sec-head">
+    <h3>Offres &amp; Demandes de mentorat récentes</h3>
+    <a href="{{ url_for('mentorat.page_mentorat') }}">Voir tout →</a>
+  </div>
+  {% for o in offres_recentes %}
+    <div class="suggest-item">
+      <div class="s-ava {{ ['av0','av1','av2'][loop.index0 % 3] }}">
+        {{ o.auteur.prenom[0]|upper }}{{ o.auteur.nom[0]|upper }}
+      </div>
+      <div class="s-body">
+        <div class="s-name">{{ o.titre[:55] }}{% if o.titre|length > 55 %}…{% endif %}</div>
+        <div class="s-meta">
+          <span style="font-size:.7rem;padding:2px 7px;border-radius:12px;
+            {% if o.type_publication == 'offre' %}background:rgba(59,130,246,0.15);color:#60a5fa{% else %}background:rgba(168,85,247,0.15);color:#c084fc{% endif %}">
+            {% if o.type_publication == 'offre' %}Offre{% else %}Demande{% endif %}
+          </span>
+          &nbsp;{{ o.auteur.prenom }} {{ o.auteur.nom }}
+          {% if o.niveau_cible %} · {{ o.niveau_cible }}{% endif %}
+        </div>
+      </div>
+      <div class="s-right">
+        <a href="{{ url_for('mentorat.page_mentorat') }}" class="btn-contact" style="font-size:.77rem">Voir →</a>
+      </div>
+    </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+  /* ─── Étape 4 : mise à jour dynamique du badge messages non lus ─── */
+  function refreshBadge() {
+    fetch('/api/messages/non-lus')
+      .then(r => r.json())
+      .then(d => {
+        const el = document.getElementById('badge-msgs');
+        if (el) el.textContent = d.count;
+      })
+      .catch(() => {});
+  }
+  /* Rafraîchir toutes les 30 secondes */
+  setInterval(refreshBadge, 30000);
+</script>
+{% endblock %}
