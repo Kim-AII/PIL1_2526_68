@@ -1,0 +1,272 @@
+ 
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rapport - IFRI MentorLink</title>
+
+ <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+body {
+  background: #f7f7f7; /* Gris très clair, doux pour les yeux */
+  font-family: 'Segoe UI', sans-serif;
+  color: #222; /* Texte principal noir */
+  animation: fadeInBody 1.2s ease;
+  min-height: 100vh;
+}
+ 
+.container {
+  padding: 2rem 2.5rem;
+  background: #fff; /* Blanc pur pour la carte */
+  border-radius: 18px;
+  box-shadow: 0 8px 32px 0 rgba(0,0,0,0.08); /* Ombre douce */
+  margin: 2.5rem auto;
+  max-width: 900px;
+  animation: slideUp 1s cubic-bezier(.23,1.02,.64,.99);
+  border: none;
+}
+ 
+h1 {
+  background: none;
+  color: #111; /* Noir profond */
+  border-radius: 10px;
+  padding: 1rem 0.5rem;
+  margin-bottom: 2rem;
+  letter-spacing: 1px;
+  font-weight: 700;
+  font-size: 2.1rem;
+  text-shadow: 0 2px 12px rgba(0,0,0,0.04);
+  background: #fff;
+  box-shadow: 0 2px 12px 0 rgba(0,0,0,0.08);
+}
+ 
+h2 {
+  color: #111; /* Noir profond */
+  background: #f2f2f2; /* Gris très clair */
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  margin-top: 2.2rem;
+  margin-bottom: 1rem;
+  font-weight: 600;
+  font-size: 1.3rem;
+  letter-spacing: 0.5px;
+  box-shadow: 0 1px 6px 0 rgba(0,0,0,0.04);
+}
+ 
+ul {
+  background: #f8f8f8; /* Gris très clair */
+  border-radius: 10px;
+  padding: 1rem 1.2rem;
+  margin-bottom: 1.2rem;
+  box-shadow: 0 1px 6px 0 rgba(0,0,0,0.04);
+}
+ 
+ul li {
+  margin-bottom: 0.6rem;
+  padding: 0.5rem 0.7rem;
+  transition: background 0.2s, transform 0.2s;
+  border-left: 4px solid #222; /* Liseré noir */
+  background: #fff;
+  border-radius: 6px;
+  color: #222;
+  font-weight: 500;
+}
+ 
+ul li:hover {
+  transform: scale(1.03) translateX(8px);
+  background: #f2f2f2;
+  border-left: 4px solid #555;
+}
+ 
+a {
+  color: #007bff; /* Bleu Bootstrap pour les liens */
+  text-decoration: underline;
+  transition: color 0.2s;
+  font-weight: 600;
+}
+a:hover {
+  color: #0056b3;
+  text-decoration: none;
+}
+ 
+p {
+  font-size: 1.08rem;
+  color: #222;
+  margin-bottom: 1.2rem;
+  background: #f8f8f8;
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+}
+ 
+.footer {
+  margin-top: 2.5rem;
+  padding: 1rem 0.5rem;
+  background: #222;
+  color: #fff;
+  border-radius: 8px;
+  text-align: center;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 12px 0 rgba(0,0,0,0.08);
+  opacity: 0;
+  animation: fadeInContent 1s forwards;
+  animation-delay: 1.5s;
+}
+ 
+/* Animations existantes */
+@keyframes fadeInBody {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes slideUp {
+  from { transform: translateY(40px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+h1, h2 {
+  opacity: 0;
+  animation: fadeInTitle 1s forwards;
+}
+h1 { animation-delay: 0.5s; }
+h2 { animation-delay: 1s; }
+@keyframes fadeInTitle {
+  to { opacity: 1; }
+}
+ul, p, .footer {
+  opacity: 0;
+  animation: fadeInContent 1s forwards;
+  animation-delay: 1.5s;
+}
+@keyframes fadeInContent {
+  to { opacity: 1; }
+}
+ 
+/* Style pour les boutons de section */
+.section-btn {
+  background: #222; /* Noir profond */
+  color: #fff;
+  font-weight: 700;
+  font-size: 1.1rem;
+  border: none;
+  border-radius: 8px;
+  margin-bottom: 0.7rem;
+  box-shadow: 0 2px 8px 0 rgba(0,0,0,0.08);
+  transition: background 0.2s, box-shadow 0.2s, color 0.2s;
+}
+.section-btn:focus, .section-btn:hover {
+  background: #fff;
+  color: #222;
+  box-shadow: 0 4px 16px 0 rgba(0,0,0,0.13);
+  outline: none;
+  border: 1.5px solid #222;
+}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 class="text-center"> RAPPORT DE TRAVAIL SUR LE PROJET IFRI MENTORLINK</h1>
+ 
+    <button class="section-btn w-100 text-start" type="button" data-bs-toggle="collapse" data-bs-target="#contexte" aria-expanded="true" aria-controls="contexte">
+      1-  Contexte
+    </button>
+    <div class="collapse show" id="contexte">
+      <h2>1-  Contexte</h2>
+      <p>Dans le cadre du projet intégrateur (PIL1), nous avons été chargés de concevoir et développer <strong>IFRI MentorLink</strong>, une application web de mentorat entre étudiants de l'IFRI. L'objectif est de permettre à chaque étudiant de créer un profil (filière, niveau, compétences maîtrisées, lacunes à combler et disponibilités), d'être mis en relation automatiquement avec des mentors ou mentorés compatibles grâce à un algorithme de matching fournissant un score de compatibilité, puis d'échanger en temps réel via une messagerie instantanée. Ce projet nous a permis de mettre en pratique nos compétences en <strong>Flask</strong>, en bases de données (SQLAlchemy), en intégration front-end (HTML/CSS/JS, Jinja2) ainsi qu'en travail collaboratif via Git/GitHub.</p>
+    </div>
+ 
+    <button class="section-btn w-100 text-start" type="button" data-bs-toggle="collapse" data-bs-target="#resume" aria-expanded="false" aria-controls="resume">
+      2- Résumé des actions réalisées
+    </button>
+    <div class="collapse" id="resume">
+      <h2>2-  Résumé des actions réalisées</h2>
+      <ul>
+        <li> <strong>Architecture &amp; dépôt</strong> : mise en place de l'architecture Flask (factory <em>create_app</em>, organisation en blueprints, fichiers <em>run.py</em> / <em>app.py</em> / <em>config.py</em>) et création du dépôt GitHub du projet, ainsi que la configuration de la base de données et l'application des migrations (réalisé par KARIM ISSAOU Abdou-Hakim, avec la coordination du chef de groupe GNAGO Béga Modeste).</li>
+        <li> <strong>Authentification</strong> : développement de l'inscription, de la connexion, de la déconnexion et de la réinitialisation de mot de passe avec Flask-Login (réalisé par GNAGO Béga Modeste).</li>
+        <li> <strong>Matching</strong> : conception de l'algorithme de compatibilité (prise en compte des compétences communes, des disponibilités et de la proximité filière/niveau), calcul du score, recherche et filtres par filière (réalisé en tandem par ADANDE Idelphonse Aziz et Regina MONTCHO).</li>
+        <li> <strong>Tableau de bord &amp; Profil</strong> : réalisation du dashboard (statistiques, suggestions de matching, complétion du profil, conversations récentes) et de la page profil (gestion des compétences — points forts et lacunes — et des disponibilités) (réalisé par KARIM ISSAOU Abdou-Hakim).</li>
+        <li> <strong>Messagerie instantanée</strong> : développement des conversations, de l'envoi de messages en temps réel et du compteur de messages non lus (réalisé en tandem par ABOUDOU KARIM YOUSSAO Nourou Dine et KESSOU Sandrine).</li>
+        <li> <strong>Frontend &amp; système de design</strong> : mise en place d'un système de design unifié (thème sombre, dégradé bleu → cyan, polices Sora + Plus Jakarta Sans, icônes Font Awesome, logo SVG) et intégration des pages :
+          <ul>
+            <li>page d'accueil, connexion, inscription, réinitialisation de mot de passe</li>
+            <li>tableau de bord, profil, matching, messagerie</li>
+            <li>mise en page responsive et animations avec CSS, Bootstrap et JavaScript</li>
+          </ul>
+          (effort collectif coordonné par les responsables de chaque module).
+        </li>
+        <li> <strong>Rédaction du rapport et de la documentation</strong> (réalisé par KOKOBITA Exaucée Martinienne OLUWA-TOSSIN).</li>
+        <li> <strong>Tests &amp; gestion du dépôt</strong> : tests fonctionnels des modules et gestion des branches/versions sur GitHub (réalisé par KARIM ISSAOU Abdou-Hakim).</li>
+      </ul>
+    </div>
+ 
+    <button class="section-btn w-100 text-start" type="button" data-bs-toggle="collapse" data-bs-target="#problemes" aria-expanded="false" aria-controls="problemes">
+      3- Différents problèmes rencontrés
+    </button>
+    <div class="collapse" id="problemes">
+      <h2>3- Différents problèmes rencontrés</h2>
+      <ul>
+        <li> Au Backend
+          <ul>
+            <li>Lancement de l'application impossible à cause d'un module de configuration manquant (<em>config.py</em> absent / mal nommé) provoquant une erreur <em>ModuleNotFoundError</em> (réglé par KARIM ISSAOU Abdou-Hakim).</li>
+            <li>Concordance des modèles (Utilisateur, Compétence, Disponibilité) entre la page profil et l'algorithme de matching (réglé par Aziz, Regina et Hakim).</li>
+            <li>Ouverture d'une conversation encore inexistante depuis la page matching : il a fallu gérer la création d'une nouvelle conversation avant l'envoi du premier message (réglé par Dine et Sandrine).</li>
+          </ul>
+        </li>
+        <li> Au Frontend
+          <ul>
+            <li>Boutons « Contacter » et « Voir le profil » du matching qui menaient vers des endpoints API renvoyant du JSON brut au lieu des pages : recâblage de « Contacter » vers la messagerie et affichage du profil dans une fiche dédiée (réglé par Aziz et Regina).</li>
+            <li>Incohérences visuelles entre les pages (branding, couleurs et polices différents d'une page à l'autre) : mise en place d'un système de design unifié (réglé par l'équipe, via les responsables de modules).</li>
+            <li>Présence de fichiers CSS dupliqués (un sous-dossier <em>css/css/</em> redondant) : nettoyage et réorganisation du dossier de styles (réglé par Hakim).</li>
+          </ul>
+        </li>
+        <li>Autres problèmes
+          <ul>
+            <li>Paramétrage et mises à jour fréquentes de la base de données, migrations et restructuration du projet (réglé par Hakim et Modeste).</li>
+            <li>Gestion des conflits Git lors du travail collaboratif sur le dépôt (géré par l'ensemble de l'équipe).</li>
+            <li>Suivi des séances : le compteur « Session active » du tableau de bord reflète actuellement le nombre de matchings et non de véritables séances planifiées entre deux étudiants. La planification de séances (proposition d'un créneau puis acceptation) a été identifiée comme une amélioration à intégrer dans une version future, par manque de temps.</li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+ 
+    <button class="section-btn w-100 text-start" type="button" data-bs-toggle="collapse" data-bs-target="#chronologie" aria-expanded="false" aria-controls="chronologie">
+      4- Chronologie du déroulement des travaux
+    </button>
+    <div class="collapse" id="chronologie">
+      <h2>4-  Chronologie du déroulement des travaux</h2>
+      <ul>
+        <li> Du 03/06/2026 au 04/06/2026 :
+          <ul>
+            <li>Création du groupe WhatsApp de travail</li>
+            <li>Création du dépôt GitHub et choix de la stack technique (Flask)</li>
+            <li>Attribution des différents rôles</li>
+            <li>Réalisation et rendu des premières maquettes</li>
+            <li>Nombre de meetings (02) — présence de tous les membres</li>
+          </ul>
+        </li>
+        <li> Du 04/06/2026 au 06/06/2026 :
+          <ul>
+            <li>Développement des modules : authentification, profil, matching, messagerie et tableau de bord</li>
+            <li>Mise en place des liaisons front / back</li>
+            <li>Nombre de meetings (03) — présence de tous les membres</li>
+          </ul>
+        </li>
+        <li> Du  06/06/2026 au 10/06/2026 :
+          <ul>
+            <li>Intégration finale, tests et corrections (recâblage des boutons du matching, harmonisation du design, nettoyage du dépôt)</li>
+            <li>Rédaction du rapport et finalisation de la documentation</li>
+            <li>Nombre de meetings (02) — présence de tous les membres</li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+ 
+    <div class="footer">
+      Rédigé par : KOKOBITA Exaucée Martinienne OLUWA-TOSSIN<br>
+      Équipe : GNAGO Béga Modeste (chef de groupe), ADANDE Idelphonse Aziz, KARIM ISSAOU Abdou-Hakim, ABOUDOU KARIM YOUSSAO Nourou Dine, KESSOU Sandrine, Regina MONTCHO
+    </div>
+  </div>
+ 
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+    </html>
