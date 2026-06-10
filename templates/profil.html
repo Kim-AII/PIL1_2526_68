@@ -1,0 +1,361 @@
+{% extends 'base.html' %}
+{% block title %}Mon profil — IFRI MentorLink{% endblock %}
+{% block page_title %}Mon profil{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/profil.css') }}">
+{% endblock %}
+
+{% block content %}
+
+<div class="profil-grid">
+
+  <!-- ══ COL GAUCHE ══ -->
+  <div>
+
+    <!-- Informations personnelles -->
+    <div class="p-card">
+      <div class="p-head"><h3>Informations personnelles</h3></div>
+      <div class="p-body">
+        <form method="POST" action="{{ url_for('users.modifier_profil') }}">
+
+          <div class="f-row">
+            <div class="f-field">
+              <label>Prénom</label>
+              <input type="text" name="prenom" value="{{ current_user.prenom }}" required />
+            </div>
+            <div class="f-field">
+              <label>Nom</label>
+              <input type="text" name="nom" value="{{ current_user.nom }}" required />
+            </div>
+          </div>
+
+          <div class="f-row">
+            <div class="f-field">
+              <label>Filière</label>
+              <select name="filiere">
+                <option value="">— Choisir —</option>
+                {% for f in ['IA', 'IM', 'GL', 'SE_IoT', 'SI'] %}
+                  <option value="{{ f }}" {% if current_user.filiere == f %}selected{% endif %}>
+                    {{ f.replace('_', '&') }}
+                  </option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="f-field">
+              <label>Niveau</label>
+              <select name="niveau">
+                <option value="">— Choisir —</option>
+                {% for n in ['L1', 'L2', 'L3', 'M1', 'M2'] %}
+                  <option value="{{ n }}" {% if current_user.niveau == n %}selected{% endif %}>{{ n }}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+
+          <div class="f-field">
+            <label>Bio courte</label>
+            <textarea name="bio" placeholder="Présentez-vous en quelques mots…">{{ current_user.bio or '' }}</textarea>
+          </div>
+
+          <!-- Nouveau mot de passe (optionnel) -->
+          <div class="f-row">
+            <div class="f-field">
+              <label>Nouveau mot de passe <span class="opt">(optionnel)</span></label>
+              <input type="password" name="nouveau_mot_de_passe" placeholder="Laisser vide = inchangé" autocomplete="new-password" />
+            </div>
+            <div class="f-field">
+              <label>Confirmer</label>
+              <input type="password" name="confirmer_mot_de_passe" placeholder="Répéter le mot de passe" autocomplete="new-password" />
+            </div>
+          </div>
+
+          <button type="submit" class="btn-save">
+            <i class="fa-solid fa-floppy-disk"></i> Enregistrer les modifications
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Compétences -->
+    <div class="p-card">
+      <div class="p-head"><h3>Compétences</h3></div>
+      <div class="p-body">
+
+        <!-- Toggle fort / faible -->
+        <div class="comp-toggle">
+          <button class="ct-btn active-g" id="tab-fort" onclick="setTab('fort')">
+            <i class="fa-solid fa-star"></i> Points forts
+          </button>
+          <button class="ct-btn" id="tab-faible" onclick="setTab('faible')">
+            <i class="fa-solid fa-circle-half-stroke"></i> Points à améliorer
+          </button>
+        </div>
+
+        <!-- Tags forts -->
+        <div id="panel-fort">
+          <div class="comp-list" id="list-fort">
+            {% for uc in current_user.competences if uc.type == 'fort' %}
+              <span class="comp-tag comp-tag-g" id="ct-{{ uc.competence_id }}">
+                {{ uc.competence.nom }}
+                <button onclick="removeComp({{ uc.competence_id }})" title="Retirer"><i class="fa-solid fa-xmark"></i></button>
+              </span>
+            {% else %}
+              <span id="empty-fort" class="comp-empty">
+                Aucun point fort renseigné.
+              </span>
+            {% endfor %}
+          </div>
+          <div class="comp-add-row">
+            <select id="sel-fort"><option value="">— Choisir une compétence —</option></select>
+            <button class="btn-add-g" onclick="addComp('fort')"><i class="fa-solid fa-plus"></i> Fort</button>
+          </div>
+        </div>
+
+        <!-- Tags faibles -->
+        <div id="panel-faible" style="display:none">
+          <div class="comp-list" id="list-faible">
+            {% for uc in current_user.competences if uc.type == 'faible' %}
+              <span class="comp-tag comp-tag-r" id="ct-{{ uc.competence_id }}">
+                {{ uc.competence.nom }}
+                <button onclick="removeComp({{ uc.competence_id }})" title="Retirer"><i class="fa-solid fa-xmark"></i></button>
+              </span>
+            {% else %}
+              <span id="empty-faible" class="comp-empty">
+                Aucune lacune renseignée.
+              </span>
+            {% endfor %}
+          </div>
+          <div class="comp-add-row">
+            <select id="sel-faible"><option value="">— Choisir une compétence —</option></select>
+            <button class="btn-add-r" onclick="addComp('faible')"><i class="fa-solid fa-plus"></i> À améliorer</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ══ COL DROITE ══ -->
+  <div>
+
+    <!-- Avatar -->
+    <div class="ava-card">
+      <div class="ava-circle">
+        {{ current_user.prenom[0] | upper }}{{ current_user.nom[0] | upper }}
+      </div>
+      <div class="ava-name">{{ current_user.prenom }} {{ current_user.nom }}</div>
+      <div class="ava-sub">{{ current_user.email }}</div>
+      <div class="ava-chips">
+        {% if current_user.filiere %}
+          <span class="chip chip-g">{{ current_user.filiere }}</span>
+        {% endif %}
+        {% if current_user.niveau %}
+          <span class="chip">{{ current_user.niveau }}</span>
+        {% endif %}
+        <span class="chip">{{ current_user.competences | length }} compétences</span>
+      </div>
+    </div>
+
+    <!-- Disponibilités -->
+    <div class="p-card">
+      <div class="p-head"><h3>Disponibilités horaires</h3></div>
+      <div class="p-body">
+
+        <div class="dispo-list" id="dispo-list">
+          {% for d in current_user.disponibilites %}
+            <div class="dispo-item" id="dispo-{{ d.id }}">
+              <div class="dispo-info">
+                <span class="dispo-jour">{{ d.jour }}</span>
+                <span class="dispo-time">
+                  {{ d.heure_debut.strftime('%H:%M') }} – {{ d.heure_fin.strftime('%H:%M') }}
+                </span>
+              </div>
+              <button class="btn-rm" onclick="removeDispo({{ d.id }})" title="Supprimer"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+          {% else %}
+            <p id="empty-dispo" class="dispo-empty">
+              Aucune disponibilité renseignée.
+            </p>
+          {% endfor %}
+        </div>
+
+        <!-- Formulaire d'ajout -->
+        <div class="dispo-form">
+          <div>
+            <label>Jour</label>
+            <select id="dispo-jour">
+              {% for j in ['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'] %}
+                <option>{{ j }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div>
+            <label>Début</label>
+            <input type="time" id="dispo-debut" value="08:00" />
+          </div>
+          <div>
+            <label>Fin</label>
+            <input type="time" id="dispo-fin" value="10:00" />
+          </div>
+          <div>
+            <label>&nbsp;</label>
+            <button class="btn-add-dispo" onclick="addDispo()"><i class="fa-solid fa-plus"></i> Ajouter</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- Toast notification -->
+<div class="toast" id="toast"></div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+  /* ─── Toast ─── */
+  function showToast(msg, ok = true) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast ' + (ok ? 'toast-ok' : 'toast-err');
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
+
+  /* ─── Onglets compétences ─── */
+  function setTab(type) {
+    const isFort = type === 'fort';
+    document.getElementById('panel-fort').style.display   = isFort ? '' : 'none';
+    document.getElementById('panel-faible').style.display = isFort ? 'none' : '';
+    document.getElementById('tab-fort').className   = 'ct-btn' + (isFort ? ' active-g' : '');
+    document.getElementById('tab-faible').className = 'ct-btn' + (!isFort ? ' active-r' : '');
+  }
+
+  /* ─── Charger liste des compétences ─── */
+  let allComps = [];
+  fetch('/api/competences')
+    .then(r => r.json())
+    .then(data => {
+      allComps = data;
+      ['fort', 'faible'].forEach(type => {
+        const sel = document.getElementById('sel-' + type);
+        data.forEach(c => {
+          const opt = document.createElement('option');
+          opt.value = c.id;
+          opt.textContent = c.nom + (c.categorie ? ' — ' + c.categorie : '');
+          sel.appendChild(opt);
+        });
+      });
+    });
+
+  /* ─── Ajouter compétence ─── */
+  function addComp(type) {
+    const sel = document.getElementById('sel-' + type);
+    const id  = parseInt(sel.value);
+    if (!id) return showToast('Choisissez une compétence.', false);
+
+    fetch('/api/profil/competences', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ competence_id: id, type })
+    })
+    .then(r => r.json())
+    .then(d => {
+      if (!d.succes) return showToast('Erreur.', false);
+
+      const comp = allComps.find(c => c.id === id);
+      if (!comp) return;
+
+      // Supprimer l'existing si déjà présent
+      const existing = document.getElementById('ct-' + id);
+      if (existing) existing.remove();
+
+      // Vider messages "aucun"
+      ['fort','faible'].forEach(t => {
+        const em = document.getElementById('empty-' + t);
+        if (em) em.remove();
+      });
+
+      const list = document.getElementById('list-' + type);
+      const tag  = document.createElement('span');
+      tag.id        = 'ct-' + id;
+      tag.className = 'comp-tag comp-tag-' + (type === 'fort' ? 'g' : 'r');
+      tag.innerHTML = `${comp.nom} <button onclick="removeComp(${id})" title="Retirer"><i class="fa-solid fa-xmark"></i></button>`;
+      list.appendChild(tag);
+
+      sel.value = '';
+      showToast('Compétence ajoutée.', true);
+    })
+    .catch(() => showToast('Erreur réseau.', false));
+  }
+
+  /* ─── Supprimer compétence ─── */
+  function removeComp(id) {
+    fetch('/api/profil/competences/' + id, { method: 'DELETE' })
+      .then(r => r.json())
+      .then(d => {
+        if (!d.succes) return showToast('Erreur.', false);
+        const el = document.getElementById('ct-' + id);
+        if (el) el.remove();
+        showToast('Compétence retirée.', true);
+      })
+      .catch(() => showToast('Erreur réseau.', false));
+  }
+
+  /* ─── Ajouter disponibilité ─── */
+  function addDispo() {
+    const jour   = document.getElementById('dispo-jour').value;
+    const debut  = document.getElementById('dispo-debut').value;
+    const fin    = document.getElementById('dispo-fin').value;
+
+    if (!debut || !fin) return showToast('Renseignez les heures.', false);
+    if (debut >= fin)   return showToast('L\'heure de fin doit être après le début.', false);
+
+    fetch('/api/profil/disponibilites', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ jour, heure_debut: debut, heure_fin: fin })
+    })
+    .then(r => r.json())
+    .then(d => {
+      if (!d.succes) return showToast('Erreur.', false);
+
+      const empty = document.getElementById('empty-dispo');
+      if (empty) empty.remove();
+
+      const list = document.getElementById('dispo-list');
+      const row  = document.createElement('div');
+      row.id        = 'dispo-' + d.id;
+      row.className = 'dispo-item';
+      row.innerHTML = `
+        <div class="dispo-info">
+          <span class="dispo-jour">${jour}</span>
+          <span class="dispo-time">${debut} – ${fin}</span>
+        </div>
+        <button class="btn-rm" onclick="removeDispo(${d.id})" title="Supprimer"><i class="fa-solid fa-xmark"></i></button>`;
+      list.appendChild(row);
+      showToast('Disponibilité ajoutée.', true);
+    })
+    .catch(() => showToast('Erreur réseau.', false));
+  }
+
+  /* ─── Supprimer disponibilité ─── */
+  function removeDispo(id) {
+    fetch('/api/profil/disponibilites/' + id, { method: 'DELETE' })
+      .then(r => r.json())
+      .then(d => {
+        if (!d.succes) return showToast('Erreur.', false);
+        const el = document.getElementById('dispo-' + id);
+        if (el) el.remove();
+        showToast('Disponibilité supprimée.', true);
+      })
+      .catch(() => showToast('Erreur réseau.', false));
+  }
+</script>
+{% endblock %}

@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Inscription — IFRI MentorLink</title>
+
+  <!-- Polices harmonisées -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Sora:wght@700;800&display=swap" rel="stylesheet" />
+
+  <!-- Icônes -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+
+  <!-- Styles séparés -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/register.css') }}" />
+</head>
+<body>
+
+<!-- ═══════════ PANNEAU GAUCHE ═══════════ -->
+<div class="panel-left">
+  <div class="inner">
+    <a href="{{ url_for('main.index') }}" class="logo">
+      <div class="pip"></div>
+      IFRI MentorLink
+    </a>
+
+    <h2 class="lp-title">Créez votre profil et trouvez votre <span class="gr">mentor idéal</span></h2>
+    <p class="lp-sub">Rejoignez la communauté de mentorat de l'IFRI en quelques minutes.</p>
+
+    <div class="steps-list">
+      <div class="step-item">
+        <div class="step-num">1</div>
+        <div class="step-info">
+          <div class="step-t">Créez votre profil</div>
+          <div class="step-d">Renseignez vos informations, compétences et disponibilités.</div>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">2</div>
+        <div class="step-info">
+          <div class="step-text">Découvrez vos matchs</div>
+          <div class="step-desc">L'algorithme calcule la compatibilité et propose les meilleurs candidats.</div>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">3</div>
+        <div class="step-info">
+          <div class="step-text">Commencez le mentorat</div>
+          <div class="step-desc">Contactez votre mentor et organisez vos sessions.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="fil-rang">
+      <span class="fil">IA</span>
+      <span class="fil">IM</span>
+      <span class="fil">GL</span>
+      <span class="fil">SE&amp;IoT</span>
+      <span class="fil">SI</span>
+    </div>
+
+    <div class="lp-bottom">
+      UAC — IFRI · PIL1 2025/2026<br>
+      <a href="{{ url_for('main.index') }}">← Retour à l'accueil</a>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ FORMULAIRE ═══════════ -->
+<div class="panel-right">
+  <div class="form-box">
+
+    <div class="form-head">
+      <h2>Créer un compte</h2>
+      <p>Déjà inscrit ? <a href="{{ url_for('auth.login') }}">Se connecter</a></p>
+    </div>
+
+    <!-- Messages flash -->
+    {% with messages = get_flashed_messages(with_categories=True) %}
+      {% if messages %}
+        {% set flash_icons = {
+          'success': 'fa-circle-check',
+          'danger':  'fa-circle-xmark',
+          'warning': 'fa-triangle-exclamation',
+          'info':    'fa-circle-info'
+        } %}
+        {% for category, message in messages %}
+          <div class="flash flash-{{ category }}">
+            <i class="fa-solid {{ flash_icons.get(category, 'fa-circle-info') }}"></i> {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <form method="POST" action="{{ url_for('auth.register') }}" novalidate id="reg-form">
+
+      <!-- ── Infos personnelles ── -->
+      <div class="field-rang">
+        <div class="field">
+          <label for="nom">Nom <span class="required-star">*</span></label>
+          <input type="text" id="nom" name="nom"
+                 placeholder="Gbénovie" required
+                 value="{{ request.form.get('nom', '') }}" />
+        </div>
+        <div class="field">
+          <label for="prenom">Prénom <span class="required-star">*</span></label>
+          <input type="text" id="prenom" name="prenom"
+                 placeholder="Kouassi" required
+                 value="{{ request.form.get('prenom', '') }}" />
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="email">Adresse email <span class="required-star">*</span></label>
+        <input type="email" id="email" name="email"
+               placeholder="exemple@ifri.uac.bj" required
+               autocomplete="email"
+               value="{{ request.form.get('email', '') }}" />
+      </div>
+
+      <div class="field">
+        <label for="telephone">Numéro de téléphone <span class="required-star">*</span></label>
+        <input type="tel" id="telephone" name="telephone"
+               placeholder="+229 60 00 00 00" required
+               autocomplete="tel"
+               value="{{ request.form.get('telephone', '') }}" />
+      </div>
+
+      <!-- ── Parcours académique ── -->
+      <div class="form-section">Parcours académique</div>
+
+      <div class="field-rang">
+        <div class="field">
+          <label for="filiere">Filière</label>
+          <select id="filiere" name="filiere">
+            <option value="">— Choisir —</option>
+            {% for f in ['IA', 'IM', 'GL', 'SE_IoT', 'SI'] %}
+              <option value="{{ f }}"
+                {% if request.form.get('filiere') == f %}selected{% endif %}>
+                {{ f.replace('_', '&') }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="field">
+          <label for="niveau">Niveau</label>
+          <select id="niveau" name="niveau">
+            <option value="">— Choisir —</option>
+            {% for n in ['L1', 'L2', 'L3', 'M1', 'M2'] %}
+              <option value="{{ n }}"
+                {% if request.form.get('niveau') == n %}selected{% endif %}>
+                {{ n }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+
+      <!-- ── Sécurité ── -->
+      <div class="form-section">Sécurité</div>
+
+      <div class="field">
+        <label for="mot_de_passe">Mot de passe <span class="required-star">*</span></label>
+        <div class="pw-wrap">
+          <input type="password" id="mot_de_passe" name="mot_de_passe"
+                 placeholder="Minimum 6 caractères" required
+                 autocomplete="new-password"
+                 oninput="checkStrength(this.value)" />
+          <button type="button" class="pw-eye" onclick="togglePw('mot_de_passe', this)"
+                  aria-label="Afficher le mot de passe">
+            <i class="fa-solid fa-eye"></i>
+          </button>
+        </div>
+        <div class="pw-strength">
+          <div class="pw-bar" id="bar1"></div>
+          <div class="pw-bar" id="bar2"></div>
+          <div class="pw-bar" id="bar3"></div>
+          <div class="pw-bar" id="bar4"></div>
+        </div>
+        <div class="pw-hint" id="pw-hint">Au moins 6 caractères</div>
+      </div>
+
+      <div class="field">
+        <label for="confirmer">Confirmer le mot de passe <span class="required-star">*</span></label>
+        <div class="pw-wrap">
+          <input type="password" id="confirmer" name="confirmer"
+                 placeholder="Retapez votre mot de passe" required
+                 autocomplete="new-password"
+                 oninput="checkMatch()" />
+          <button type="button" class="pw-eye" onclick="togglePw('confirmer', this)"
+                  aria-label="Afficher le mot de passe">
+            <i class="fa-solid fa-eye"></i>
+          </button>
+        </div>
+      </div>
+
+      <button type="submit" class="btn-submit">Créer mon compte →</button>
+      <p class="terms">En vous inscrivant, vos données sont stockées de façon sécurisée et ne sont jamais partagées.</p>
+    </form>
+  </div>
+</div>
+
+<script>
+  /* Affichage / masquage du mot de passe */
+  function togglePw(id, btn) {
+    const inp = document.getElementById(id);
+    const icon = btn.querySelector('i');
+    const shown = inp.type === 'text';
+    inp.type = shown ? 'password' : 'text';
+    icon.classList.toggle('fa-eye', shown);
+    icon.classList.toggle('fa-eye-slash', !shown);
+    btn.setAttribute('aria-label', shown ? 'Afficher le mot de passe' : 'Masquer le mot de passe');
+  }
+
+  /* Indicateur de force du mot de passe */
+  const bars   = [document.getElementById('bar1'), document.getElementById('bar2'),
+                  document.getElementById('bar3'), document.getElementById('bar4')];
+  const pwHint = document.getElementById('pw-hint');
+  const colors = ['#ef4444', '#f97316', '#eab308', '#16e07f'];
+  const labels = ['Très faible', 'Faible', 'Moyen', 'Fort'];
+
+  function checkStrength(val) {
+    let score = 0;
+    if (val.length >= 6)  score++;
+    if (val.length >= 10) score++;
+    if (/[A-Z]/.test(val) && /[0-9]/.test(val)) score++;
+    if (/[^A-Za-z0-9]/.test(val)) score++;
+
+    bars.forEach((b, i) => {
+      b.style.background = i < score ? colors[score - 1] : 'var(--border-strong)';
+    });
+    pwHint.textContent = val.length === 0 ? 'Au moins 6 caractères' : labels[score - 1] || 'Très faible';
+    pwHint.style.color = score > 0 ? colors[score - 1] : 'var(--sub)';
+  }
+
+  /* Vérification de la correspondance des mots de passe */
+  function checkMatch() {
+    const pw = document.getElementById('mot_de_passe').value;
+    const cf = document.getElementById('confirmer');
+    if (cf.value.length === 0) return;
+    cf.style.borderColor = cf.value === pw
+      ? 'rgba(22,224,127,.6)'
+      : 'rgba(248,113,113,.6)';
+  }
+</script>
+</body>
+</html>

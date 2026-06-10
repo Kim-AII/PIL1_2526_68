@@ -1,0 +1,276 @@
+ 
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rapport - IFRI MentorLink</title>
+
+<style>
+body{
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background:#f5f7fa;
+    color:#333;
+}
+
+header{
+    background:#1e3a8a;
+    color:white;
+    text-align:center;
+    padding:40px;
+}
+
+section{
+    background:white;
+    margin:20px;
+    padding:20px;
+    border-radius:10px;
+    box-shadow:0 2px 10px rgba(0,0,0,0.1);
+}
+
+h1,h2{
+    color:#1e3a8a;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+table, th, td{
+    border:1px solid #ddd;
+}
+
+th{
+    background:#1e3a8a;
+    color:white;
+}
+
+th,td{
+    padding:10px;
+    text-align:left;
+}
+
+footer{
+    text-align:center;
+    padding:20px;
+    background:#1e3a8a;
+    color:white;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>RAPPORT DU PROJET INTÉGRATEUR</h1>
+    <h2>IFRI MentorLink</h2>
+    <p>Plateforme de mise en relation entre mentors et mentorés</p>
+</header>
+
+<section>
+    <h2>1. Informations Générales</h2>
+
+    <p><strong>Université :</strong> Université d'Abomey-Calavi</p>
+    <p><strong>Établissement :</strong> IFRI</p>
+    <p><strong>Projet :</strong> IFRI MentorLink</p>
+    <p><strong>Groupe :</strong> [Numéro du groupe]</p>
+
+    <h3>Membres du groupe</h3>
+    <ul>
+        <li>[Nom membre 1]</li>
+        <li>[Nom membre 2]</li>
+        <li>[Nom membre 3]</li>
+        <li>[Nom membre 4]</li>
+        <li>[Nom membre 5]</li>
+    </ul>
+</section>
+
+<section>
+    <h2>2. Introduction</h2>
+
+    <p>
+        Dans le cadre du Projet Intégrateur de première année à l’IFRI,
+        notre équipe a développé une application web nommée
+        <strong>IFRI MentorLink</strong>.
+    </p>
+
+    <p>
+        Cette plateforme permet de mettre en relation les étudiants
+        souhaitant bénéficier ou offrir du mentorat académique et professionnel.
+    </p>
+</section>
+
+<section>
+    <h2>3. Organisation du Groupe</h2>
+
+    <table>
+        <tr>
+            <th>Membre</th>
+            <th>Responsabilité</th>
+        </tr>
+        <tr>
+            <td>[Nom]</td>
+            <td>Chef de projet</td>
+        </tr>
+        <tr>
+            <td>[Nom]</td>
+            <td>Développement Frontend</td>
+        </tr>
+        <tr>
+            <td>[Nom]</td>
+            <td>Développement Backend</td>
+        </tr>
+        <tr>
+            <td>[Nom]</td>
+            <td>Base de données</td>
+        </tr>
+        <tr>
+            <td>[Nom]</td>
+            <td>Tests et documentation</td>
+        </tr>
+    </table>
+</section>
+
+<section>
+    <h2>4. Description de la Solution</h2>
+
+    <p>
+        IFRI MentorLink est une application web permettant :
+    </p>
+
+    <ul>
+        <li>L'inscription des utilisateurs</li>
+        <li>La connexion sécurisée</li>
+        <li>La gestion des profils</li>
+        <li>La publication d'offres de mentorat</li>
+        <li>La recherche de mentors</li>
+        <li>Le système de matching</li>
+        <li>La messagerie instantanée</li>
+    </ul>
+</section>
+
+<section>
+    <h2>5. Technologies Utilisées</h2>
+
+    <ul>
+        <li>HTML5</li>
+        <li>CSS3</li>
+        <li>JavaScript</li>
+        <li>Python</li>
+        <li>Flask / Django</li>
+        <li>MySQL</li>
+        <li>Git & GitHub</li>
+    </ul>
+</section>
+
+<section>
+    <h2>6. Structure de la Base de Données</h2>
+
+    <h3>Table Utilisateurs</h3>
+
+    <ul>
+        <li>id</li>
+        <li>nom</li>
+        <li>prenom</li>
+        <li>email</li>
+        <li>telephone</li>
+        <li>mot_de_passe</li>
+    </ul>
+
+    <h3>Table Profils</h3>
+
+    <ul>
+        <li>id_profil</li>
+        <li>filiere</li>
+        <li>niveau</li>
+        <li>competences</li>
+        <li>lacunes</li>
+        <li>disponibilites</li>
+    </ul>
+
+    <h3>Table Messages</h3>
+
+    <ul>
+        <li>id_message</li>
+        <li>expediteur</li>
+        <li>destinataire</li>
+        <li>contenu</li>
+        <li>date_envoi</li>
+    </ul>
+</section>
+
+<section>
+    <h2>7. Fonctionnalités Réalisées</h2>
+
+    <ul>
+        <li>Création de compte</li>
+        <li>Connexion utilisateur</li>
+        <li>Modification du profil</li>
+        <li>Recherche mentor / mentoré</li>
+        <li>Système de compatibilité</li>
+        <li>Messagerie intégrée</li>
+        <li>Historique des conversations</li>
+    </ul>
+</section>
+
+<section>
+    <h2>8. Difficultés Rencontrées</h2>
+
+    <ul>
+        <li>Conception de la base de données</li>
+        <li>Gestion des relations SQL</li>
+        <li>Développement du matching</li>
+        <li>Collaboration avec GitHub</li>
+    </ul>
+</section>
+
+<section>
+    <h2>9. Instructions de Déploiement</h2>
+
+    <ol>
+        <li>Cloner le dépôt GitHub.</li>
+        <li>Installer les dépendances Python.</li>
+        <li>Créer la base de données MySQL.</li>
+        <li>Importer le fichier SQL.</li>
+        <li>Lancer le serveur.</li>
+        <li>Accéder à l'application depuis un navigateur.</li>
+    </ol>
+</section>
+
+<section>
+    <h2>10. Manuel d'Utilisation</h2>
+
+    <ol>
+        <li>Créer un compte.</li>
+        <li>Compléter son profil.</li>
+        <li>Ajouter ses compétences et lacunes.</li>
+        <li>Rechercher un mentor ou mentoré.</li>
+        <li>Consulter les résultats de matching.</li>
+        <li>Communiquer via la messagerie.</li>
+    </ol>
+</section>
+
+<section>
+    <h2>11. Conclusion</h2>
+
+    <p>
+        Le projet IFRI MentorLink nous a permis d'appliquer les notions
+        apprises en algorithmique, développement web, bases de données,
+        SQL et Python.
+    </p>
+
+    <p>
+        Cette expérience a également renforcé nos compétences en
+        collaboration, gestion de projet et résolution de problèmes.
+    </p>
+</section>
+
+<footer>
+    <p>Projet Intégrateur 2025-2026 - IFRI MentorLink</p>
+</footer>
+
+</body>
+    </html>
