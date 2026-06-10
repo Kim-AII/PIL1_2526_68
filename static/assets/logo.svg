@@ -1,0 +1,28 @@
+<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="MentorLink">
+  <title>MentorLink</title>
+  <defs>
+    <linearGradient id="mlGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#3b82f6"/>
+      <stop offset="1" stop-color="#22d3ee"/>
+    </linearGradient>
+    <linearGradient id="mlTile" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#101b30"/>
+      <stop offset="1" stop-color="#0a1322"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Tuile -->
+  <rect x="1" y="1" width="62" height="62" rx="16"
+        fill="url(#mlTile)" stroke="#ffffff" stroke-opacity="0.10"/>
+
+  <!-- Lueur derrière le node -->
+  <circle cx="45" cy="21" r="11" fill="#22d3ee" opacity="0.18"/>
+
+  <!-- « M » Mentor -->
+  <path d="M 19 45 L 19 21 L 32 35 L 45 21 L 45 45"
+        fill="none" stroke="url(#mlGrad)" stroke-width="6"
+        stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Node « Link » -->
+  <circle cx="45" cy="21" r="5" fill="#22d3ee" stroke="#0b1322" stroke-width="2.5"/>
+</svg>

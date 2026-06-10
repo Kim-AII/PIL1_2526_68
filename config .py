@@ -8,10 +8,9 @@ class Config:
     # Connexion MySQL — modifier selon votre environnement
     SQLALCHEMY_DATABASE_URI = os.environ.get(
         'DATABASE_URL',
-        'mysql+pymysql://root:@localhost/mentorlink_db'
+        'mysql+pymysql://root:MdpMysql@localhost/mentorlink_db'
     )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-
+    JSON_ENSURE_ASCII = False
     # Taille max d'upload (photos de profil)
-    MAX_CONTENT_LENGTH = 2 * 1024 * 1024  # 2 Mo
-SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:@localhost/mentorlink_db'
+    MAX_CONTENT_LENGTH = 2 * 1024 * 1024  

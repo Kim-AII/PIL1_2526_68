@@ -16,7 +16,7 @@ users_bp = Blueprint('users', __name__)
 def dashboard():
     # Imports locaux pour éviter les imports circulaires
     from routes.matching import generer_suggestions
-    from models import Message, Conversation, Matching
+    from models import Message, Conversation, Matching, SeanceMentorat, OffreMentorat
 
     uid = current_user.id
 
@@ -39,6 +39,18 @@ def dashboard():
         Matching.statut == 'accepte'
     ).count()
 
+    # 4b. Séances de mentorat planifiées/confirmées
+    nb_seances = SeanceMentorat.query.filter(
+        (SeanceMentorat.mentor_id == uid) | (SeanceMentorat.mentore_id == uid),
+        SeanceMentorat.statut.in_(['planifiee', 'confirmee'])
+    ).count()
+
+    # 4c. Publications (offres/demandes) récentes compatibles (3 dernières)
+    offres_recentes = OffreMentorat.query.filter(
+        OffreMentorat.statut == 'ouverte',
+        OffreMentorat.auteur_id != uid
+    ).order_by(OffreMentorat.date_creation.desc()).limit(3).all()
+
     # 5. Conversations récentes (3 dernières)
     convs_recentes = Conversation.query.filter(
         (Conversation.user1_id == uid) | (Conversation.user2_id == uid)
@@ -57,6 +69,8 @@ def dashboard():
                            nb_messages=nb_messages,
                            nb_competences=nb_competences,
                            nb_matchings=nb_matchings,
+                           nb_seances=nb_seances,
+                           offres_recentes=offres_recentes,
                            convs_recentes=convs_recentes,
                            completion=completion)
 
@@ -221,3 +235,27 @@ def get_utilisateur(user_id):
     ]
     data['disponibilites'] = [d.to_dict() for d in user.disponibilites]
     return jsonify(data)
+ 
+ # ──────────────────────────────────────────────
+#  PROFIL — voir le profil d'un autre utilisateur
+# ──────────────────────────────────────────────
+@users_bp.route('/utilisateur/<int:user_id>')
+@login_required
+def voir_profil(user_id):
+    """Page HTML du profil d'un autre utilisateur (lecture seule)."""
+    profil = Utilisateur.query.get_or_404(user_id)
+
+    # Score de compatibilité avec l'utilisateur connecté
+    from routes.matching import calculer_score
+    score = calculer_score(profil, current_user)
+
+    # Compétences communes
+    from routes.matching import get_competences_communes, get_dispos_communes
+    competences_communes   = get_competences_communes(profil, current_user)
+    disponibilites_communes = get_dispos_communes(profil, current_user)
+
+    return render_template('voir_profil.html',
+                           profil=profil,
+                           score=score,
+                           competences_communes=competences_communes,
+                           disponibilites_communes=disponibilites_communes)

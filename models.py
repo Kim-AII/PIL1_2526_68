@@ -172,3 +172,124 @@ class Message(db.Model):
             'lu':              self.lu,
             'date_envoi':      self.date_envoi.isoformat()
         }
+
+
+# ──────────────────────────────────────────────
+#  OFFRE MENTORAT
+#  type_publication : 'offre' (mentor propose) | 'demande' (mentoré cherche)
+# ──────────────────────────────────────────────
+class OffreMentorat(db.Model):
+    __tablename__ = 'offres_mentorat'
+
+    id               = db.Column(db.Integer, primary_key=True)
+    auteur_id        = db.Column(db.Integer, db.ForeignKey('utilisateurs.id'), nullable=False)
+    type_publication = db.Column(db.String(10), nullable=False)   # 'offre' | 'demande'
+    titre            = db.Column(db.String(150), nullable=False)
+    description      = db.Column(db.Text)
+    competence_id    = db.Column(db.Integer, db.ForeignKey('competences.id'), nullable=True)
+    niveau_cible     = db.Column(db.String(5))     # L1, L2, L3, M1, M2
+    filiere_cible    = db.Column(db.String(20))    # IA, IM, GL, SE_IoT, SI
+    max_places       = db.Column(db.Integer, default=1)
+    statut           = db.Column(db.String(15), default='ouverte')  # ouverte | fermee | archivee
+    date_creation    = db.Column(db.DateTime, default=datetime.utcnow)
+
+    auteur       = db.relationship('Utilisateur', foreign_keys=[auteur_id])
+    competence   = db.relationship('Competence')
+    candidatures = db.relationship('CandidatureOffre', backref='offre', lazy=True,
+                                   cascade='all, delete-orphan')
+
+    @property
+    def nb_acceptees(self):
+        return sum(1 for c in self.candidatures if c.statut == 'acceptee')
+
+    @property
+    def places_restantes(self):
+        return max(0, self.max_places - self.nb_acceptees)
+
+    def to_dict(self):
+        return {
+            'id':               self.id,
+            'auteur_id':        self.auteur_id,
+            'auteur':           self.auteur.to_dict(),
+            'type_publication': self.type_publication,
+            'titre':            self.titre,
+            'description':      self.description,
+            'competence':       self.competence.to_dict() if self.competence else None,
+            'niveau_cible':     self.niveau_cible,
+            'filiere_cible':    self.filiere_cible,
+            'max_places':       self.max_places,
+            'places_restantes': self.places_restantes,
+            'statut':           self.statut,
+            'date_creation':    self.date_creation.isoformat()
+        }
+
+
+# ──────────────────────────────────────────────
+#  CANDIDATURE OFFRE
+#  Réponse d'un utilisateur à une offre ou demande
+# ──────────────────────────────────────────────
+class CandidatureOffre(db.Model):
+    __tablename__ = 'candidatures_offres'
+
+    id               = db.Column(db.Integer, primary_key=True)
+    offre_id         = db.Column(db.Integer, db.ForeignKey('offres_mentorat.id'), nullable=False)
+    candidat_id      = db.Column(db.Integer, db.ForeignKey('utilisateurs.id'),   nullable=False)
+    message          = db.Column(db.Text)
+    statut           = db.Column(db.String(15), default='en_attente')  # en_attente | acceptee | refusee
+    date_candidature = db.Column(db.DateTime, default=datetime.utcnow)
+
+    candidat = db.relationship('Utilisateur', foreign_keys=[candidat_id])
+    seance   = db.relationship('SeanceMentorat', backref='candidature', uselist=False)
+
+    __table_args__ = (
+        db.UniqueConstraint('offre_id', 'candidat_id', name='unique_candidature'),
+    )
+
+    def to_dict(self):
+        return {
+            'id':               self.id,
+            'offre_id':         self.offre_id,
+            'candidat':         self.candidat.to_dict(),
+            'message':          self.message,
+            'statut':           self.statut,
+            'date_candidature': self.date_candidature.isoformat()
+        }
+
+
+# ──────────────────────────────────────────────
+#  SEANCE MENTORAT
+#  Créée automatiquement quand une candidature est acceptée
+# ──────────────────────────────────────────────
+class SeanceMentorat(db.Model):
+    __tablename__ = 'seances_mentorat'
+
+    id               = db.Column(db.Integer, primary_key=True)
+    offre_id         = db.Column(db.Integer, db.ForeignKey('offres_mentorat.id'),  nullable=False)
+    candidature_id   = db.Column(db.Integer, db.ForeignKey('candidatures_offres.id'), nullable=False)
+    mentor_id        = db.Column(db.Integer, db.ForeignKey('utilisateurs.id'),     nullable=False)
+    mentore_id       = db.Column(db.Integer, db.ForeignKey('utilisateurs.id'),     nullable=False)
+    date_seance      = db.Column(db.DateTime, nullable=True)
+    duree_minutes    = db.Column(db.Integer, default=60)
+    lieu             = db.Column(db.String(255))
+    statut           = db.Column(db.String(15), default='planifiee')  # planifiee | confirmee | terminee | annulee
+    notes            = db.Column(db.Text)
+    date_creation    = db.Column(db.DateTime, default=datetime.utcnow)
+
+    offre   = db.relationship('OffreMentorat',  foreign_keys=[offre_id])
+    mentor  = db.relationship('Utilisateur',    foreign_keys=[mentor_id])
+    mentore = db.relationship('Utilisateur',    foreign_keys=[mentore_id])
+
+    def to_dict(self):
+        return {
+            'id':            self.id,
+            'offre_id':      self.offre_id,
+            'offre_titre':   self.offre.titre if self.offre else None,
+            'mentor':        self.mentor.to_dict(),
+            'mentore':       self.mentore.to_dict(),
+            'date_seance':   self.date_seance.isoformat() if self.date_seance else None,
+            'duree_minutes': self.duree_minutes,
+            'lieu':          self.lieu,
+            'statut':        self.statut,
+            'notes':         self.notes,
+            'date_creation': self.date_creation.isoformat()
+        }
