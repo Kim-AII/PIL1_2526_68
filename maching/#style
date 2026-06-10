@@ -502,8 +502,4 @@
       .page-title { font-size: 1.8rem; }
       .cards-grid { grid-template-columns: 1fr; }
     }
-  </style>
-</head>
-<body>
-
-<main class="page-wrapper">
+ 
