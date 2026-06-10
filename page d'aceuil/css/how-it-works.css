@@ -1,0 +1,99 @@
+/* ==========================================================================
+   MentorLink — how-it-works.css
+   Section « Comment ça marche » : parcours en 4 étapes
+   relié par une ligne, de l'inscription à la première session.
+   ========================================================================== */
+
+.how {
+  padding: clamp(4.5rem, 9vw, 8rem) 0;
+  position: relative;
+}
+
+.how__grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: clamp(1.2rem, 2.5vw, 2rem);
+  position: relative;
+}
+
+/* Ligne horizontale reliant les étapes (desktop) */
+.how__grid::before {
+  content: "";
+  position: absolute;
+  top: 28px;
+  left: 12%;
+  right: 12%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--primary), var(--cyan), transparent);
+  opacity: 0.5;
+  z-index: 0;
+}
+
+/* --- Étape -------------------------------------------------------------- */
+.step {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  padding: 0 0.5rem;
+}
+
+.step__bullet {
+  width: 58px;
+  height: 58px;
+  margin: 0 auto 1.4rem;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #0f1830, #0a1020);
+  border: 1px solid var(--border-strong);
+  box-shadow: 0 0 0 6px rgba(7, 11, 22, 1), 0 10px 30px -12px rgba(34, 211, 238, 0.5);
+  position: relative;
+}
+
+.step__bullet i {
+  font-size: 1.25rem;
+  color: var(--cyan-300);
+}
+
+/* Pastille numérotée */
+.step__bullet::after {
+  content: attr(data-step);
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--gradient);
+  color: #06121f;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 0.78rem;
+}
+
+.step h3 {
+  font-size: 1.15rem;
+  margin-bottom: 0.6rem;
+  color: var(--text);
+}
+
+.step p {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  max-width: 26ch;
+  margin: 0 auto;
+}
+
+/* --- Responsive --------------------------------------------------------- */
+@media (max-width: 880px) {
+  .how__grid { grid-template-columns: repeat(2, 1fr); row-gap: 2.5rem; }
+  .how__grid::before { display: none; }
+}
+
+@media (max-width: 480px) {
+  .how__grid { grid-template-columns: 1fr; }
+  .step p { max-width: none; }
+}

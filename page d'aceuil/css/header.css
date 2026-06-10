@@ -1,0 +1,195 @@
+/* ==========================================================================
+   MentorLink — header.css
+   Barre de navigation : transparente au-dessus du hero,
+   effet « verre » au défilement, menu responsive.
+   ========================================================================== */
+
+.header {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: 1000;
+  height: var(--header-h);
+  display: flex;
+  align-items: center;
+  background: transparent;
+  border-bottom: 1px solid transparent;
+  transition: background 0.3s ease, border-color 0.3s ease,
+              -webkit-backdrop-filter 0.3s ease, backdrop-filter 0.3s ease;
+}
+
+/* État ajouté en JS après défilement */
+.header.is-scrolled {
+  background: rgba(7, 11, 22, 0.72);
+  border-bottom-color: var(--border);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+          backdrop-filter: blur(14px) saturate(140%);
+}
+
+.header__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+}
+
+/* --- Logo --------------------------------------------------------------- */
+.header__logo { display: inline-flex; align-items: center; }
+
+.header__logo-mark {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.35rem;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+
+.header__logo-mark::after {
+  content: ".";
+  color: var(--cyan);
+}
+
+/* --- Navigation --------------------------------------------------------- */
+.header__nav { display: flex; align-items: center; }
+
+.header__nav-list {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.header__nav-link {
+  position: relative;
+  padding: 0.5rem 0.9rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  border-radius: var(--radius-pill);
+  transition: color 0.2s ease, background 0.2s ease;
+}
+
+.header__nav-link:hover { color: var(--text); }
+
+/* Soulignement animé sous les liens simples */
+.header__nav-link:not(.btn-primary)::after {
+  content: "";
+  position: absolute;
+  left: 0.9rem;
+  right: 0.9rem;
+  bottom: 0.3rem;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--gradient);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.28s ease;
+}
+
+.header__nav-link:not(.btn-primary):hover::after { transform: scaleX(1); }
+
+.header__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.header__cta { padding: 0.65rem 1.3rem; font-size: 0.92rem; }
+
+.header__login {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.header__login:hover { color: var(--cyan-300); }
+
+/* --- Bouton menu (mobile) ----------------------------------------------- */
+.header__burger {
+  display: none;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  cursor: pointer;
+  position: relative;
+}
+
+.header__burger span,
+.header__burger span::before,
+.header__burger span::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  width: 20px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--text);
+  transform: translateX(-50%);
+  transition: transform 0.3s ease, opacity 0.3s ease, top 0.3s ease;
+}
+
+.header__burger span { top: 50%; transform: translate(-50%, -50%); }
+.header__burger span::before { top: -7px; }
+.header__burger span::after  { top: 7px; }
+
+/* État ouvert */
+.header__burger[aria-expanded="true"] span { background: transparent; }
+.header__burger[aria-expanded="true"] span::before { top: 0; transform: translateX(-50%) rotate(45deg); }
+.header__burger[aria-expanded="true"] span::after  { top: 0; transform: translateX(-50%) rotate(-45deg); }
+
+/* --- Responsive --------------------------------------------------------- */
+@media (max-width: 860px) {
+  .header__burger { display: block; }
+
+  .header__nav {
+    position: fixed;
+    inset: var(--header-h) 0 auto 0;
+    flex-direction: column;
+    background: rgba(7, 11, 22, 0.96);
+    -webkit-backdrop-filter: blur(16px);
+            backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+    padding: 1.2rem var(--gutter) 1.6rem;
+    transform: translateY(-12px);
+    opacity: 0;
+    pointer-events: none;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+  }
+
+  .header__nav.is-open {
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .header__nav-list {
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+    gap: 0.4rem;
+  }
+
+  .header__nav-link {
+    padding: 0.85rem 1rem;
+    font-size: 1.05rem;
+  }
+
+  .header__nav-link:not(.btn-primary)::after { display: none; }
+
+  .header__cta { width: 100%; margin-top: 0.4rem; }
+
+  /* Le lien « Se connecter » rejoint le menu sur mobile */
+  .header__login {
+    order: 5;
+    padding: 0.85rem 1rem;
+    border-top: 1px solid var(--border);
+    margin-top: 0.4rem;
+  }
+}
+
+/* Très petits écrans : on compacte la barre pour tout faire tenir */
+@media (max-width: 480px) {
+  .header__logo-mark { font-size: 1.2rem; }
+  .header__actions { gap: 0.5rem; }
+  .header__cta { padding: 0.55rem 0.95rem; font-size: 0.85rem; }
+}

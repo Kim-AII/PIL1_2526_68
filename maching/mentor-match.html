@@ -1,0 +1,1029 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>MentorMatch — Trouve ton mentor idéal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet" />
+<style>
+  /* ─── DESIGN TOKENS ──────────────────────────────────────────────── */
+  :root {
+    --bg:          #080c14;
+    --surface:     #0d1421;
+    --surface-2:   #111927;
+    --border:      rgba(255,255,255,.07);
+    --border-glow: rgba(99,179,237,.25);
+    --accent:      #63b3ed;
+    --accent-2:    #9f7aea;
+    --accent-gold: #f6c90e;
+    --text:        #e2e8f0;
+    --text-muted:  #718096;
+    --text-dim:    #4a5568;
+    --green:       #68d391;
+    --red:         #fc8181;
+    --radius:      14px;
+    --radius-sm:   8px;
+    --shadow:      0 8px 32px rgba(0,0,0,.5);
+    --glow:        0 0 40px rgba(99,179,237,.12);
+  }
+
+  /* ─── RESET & BASE ───────────────────────────────────────────────── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+    line-height: 1.6;
+  }
+
+  /* ─── NOISE OVERLAY ──────────────────────────────────────────────── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ─── GRID BACKGROUND ────────────────────────────────────────────── */
+  .grid-bg {
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background-image:
+      linear-gradient(var(--border) 1px, transparent 1px),
+      linear-gradient(90deg, var(--border) 1px, transparent 1px);
+    background-size: 48px 48px;
+    mask-image: radial-gradient(ellipse 80% 60% at 50% 40%, #000 0%, transparent 75%);
+  }
+
+  /* ─── GLOW ORBS ──────────────────────────────────────────────────── */
+  .orb {
+    position: fixed; border-radius: 50%; filter: blur(80px);
+    pointer-events: none; z-index: 0; opacity: .35;
+  }
+  .orb-1 { width: 500px; height: 500px; background: #1e40af; top: -150px; left: -100px; }
+  .orb-2 { width: 400px; height: 400px; background: #6b21a8; bottom: -100px; right: -100px; }
+  .orb-3 { width: 300px; height: 300px; background: #065f46; top: 40%; left: 60%; }
+
+  /* ─── LAYOUT ─────────────────────────────────────────────────────── */
+  .wrapper {
+    position: relative; z-index: 1;
+    min-height: 100vh;
+    display: flex; flex-direction: column; align-items: center;
+    padding: 3rem 1.5rem 5rem;
+  }
+
+  /* ─── HEADER ─────────────────────────────────────────────────────── */
+  header {
+    text-align: center;
+    margin-bottom: 3rem;
+    animation: fadeDown .7s ease both;
+  }
+
+  .logo-badge {
+    display: inline-flex; align-items: center; gap: .5rem;
+    background: rgba(99,179,237,.08);
+    border: 1px solid rgba(99,179,237,.2);
+    border-radius: 99px;
+    padding: .35rem 1rem .35rem .6rem;
+    font-size: .75rem; font-weight: 600; letter-spacing: .08em;
+    text-transform: uppercase; color: var(--accent);
+    margin-bottom: 1.4rem;
+  }
+  .logo-badge .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 8px var(--accent);
+    animation: pulse 2s ease infinite;
+  }
+
+  h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(2.2rem, 5vw, 3.6rem);
+    font-weight: 800;
+    line-height: 1.1;
+    background: linear-gradient(135deg, #e2e8f0 0%, var(--accent) 50%, var(--accent-2) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .subtitle {
+    margin-top: .8rem;
+    color: var(--text-muted);
+    font-size: 1.05rem;
+    font-weight: 300;
+    max-width: 500px;
+    margin-inline: auto;
+  }
+
+  /* ─── STEP INDICATOR ─────────────────────────────────────────────── */
+  .steps {
+    display: flex; align-items: center; gap: .75rem;
+    margin-bottom: 2.5rem;
+    animation: fadeDown .7s .1s ease both;
+  }
+  .step {
+    display: flex; align-items: center; gap: .4rem;
+    font-size: .8rem; font-weight: 500; color: var(--text-dim);
+    transition: color .3s;
+  }
+  .step.active { color: var(--accent); }
+  .step.done { color: var(--green); }
+  .step-num {
+    width: 24px; height: 24px; border-radius: 50%;
+    border: 1.5px solid currentColor;
+    display: flex; align-items: center; justify-content: center;
+    font-size: .7rem; font-weight: 700;
+    transition: background .3s, border-color .3s;
+  }
+  .step.active .step-num { background: rgba(99,179,237,.15); }
+  .step.done .step-num { background: rgba(104,211,145,.15); }
+  .step-line { flex: 1; max-width: 40px; height: 1px; background: var(--border); }
+
+  /* ─── CARD BASE ──────────────────────────────────────────────────── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(12px);
+  }
+
+  /* ─── FORM CARD ──────────────────────────────────────────────────── */
+  #form-section {
+    width: 100%; max-width: 620px;
+    animation: fadeUp .6s .15s ease both;
+  }
+
+  .form-card {
+    padding: 2.2rem 2.4rem 2.6rem;
+    position: relative; overflow: hidden;
+  }
+  .form-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, var(--accent-2), var(--accent), var(--accent-2));
+    border-radius: var(--radius) var(--radius) 0 0;
+  }
+
+  .section-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.05rem; font-weight: 700;
+    color: var(--text);
+    margin-bottom: 1.4rem;
+    display: flex; align-items: center; gap: .5rem;
+  }
+  .section-title .icon {
+    width: 28px; height: 28px; border-radius: var(--radius-sm);
+    background: rgba(99,179,237,.1);
+    border: 1px solid rgba(99,179,237,.2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: .85rem;
+  }
+
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  @media(max-width: 520px) { .field-row { grid-template-columns: 1fr; } }
+
+  .field {
+    display: flex; flex-direction: column; gap: .45rem;
+    margin-bottom: 1.2rem;
+  }
+  .field:last-child { margin-bottom: 0; }
+
+  label {
+    font-size: .8rem; font-weight: 500;
+    color: var(--text-muted); letter-spacing: .04em; text-transform: uppercase;
+  }
+
+  input[type="text"],
+  select {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: .75rem 1rem;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: .95rem;
+    outline: none;
+    transition: border-color .2s, box-shadow .2s;
+    width: 100%;
+  }
+  input[type="text"]:focus,
+  select:focus {
+    border-color: rgba(99,179,237,.5);
+    box-shadow: 0 0 0 3px rgba(99,179,237,.08);
+  }
+  select { cursor: pointer; appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23718096' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 1rem center;
+    padding-right: 2.5rem;
+  }
+  select option { background: #1a202c; }
+
+  /* ─── CHECKBOXES ─────────────────────────────────────────────────── */
+  .checkbox-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: .6rem;
+  }
+
+  .cb-item {
+    display: flex; align-items: center; gap: .6rem;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: .6rem .9rem;
+    cursor: pointer;
+    transition: border-color .2s, background .2s;
+    user-select: none;
+  }
+  .cb-item:hover { border-color: rgba(99,179,237,.3); background: rgba(99,179,237,.04); }
+  .cb-item input[type="checkbox"] { display: none; }
+  .cb-item .cb-box {
+    width: 16px; height: 16px; border-radius: 4px;
+    border: 1.5px solid var(--text-dim);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    transition: background .2s, border-color .2s;
+    font-size: .65rem; color: transparent;
+  }
+  .cb-item input:checked ~ .cb-box {
+    background: var(--accent); border-color: var(--accent); color: #000;
+  }
+  .cb-item input:checked ~ .cb-label { color: var(--accent); }
+  .cb-label { font-size: .85rem; color: var(--text-muted); transition: color .2s; }
+
+  /* AVAILABILITY CHIPS */
+  .chips-grid {
+    display: flex; flex-wrap: wrap; gap: .5rem;
+  }
+  .chip {
+    display: flex; align-items: center; gap: .4rem;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 99px;
+    padding: .4rem .9rem;
+    cursor: pointer;
+    font-size: .82rem; color: var(--text-muted);
+    transition: border-color .2s, background .2s, color .2s;
+    user-select: none;
+  }
+  .chip:hover { border-color: rgba(159,122,234,.35); }
+  .chip.selected {
+    border-color: var(--accent-2);
+    background: rgba(159,122,234,.1);
+    color: var(--accent-2);
+  }
+  .chip input { display: none; }
+
+  /* ─── DIVIDER ────────────────────────────────────────────────────── */
+  .divider {
+    height: 1px; background: var(--border);
+    margin: 1.8rem 0;
+  }
+
+  /* ─── SUBMIT BUTTON ──────────────────────────────────────────────── */
+  .btn-submit {
+    width: 100%; padding: 1rem;
+    background: linear-gradient(135deg, #1d4ed8, var(--accent-2));
+    border: none; border-radius: var(--radius-sm);
+    color: #fff; font-family: 'Syne', sans-serif;
+    font-size: 1rem; font-weight: 700;
+    cursor: pointer; letter-spacing: .03em;
+    position: relative; overflow: hidden;
+    transition: transform .2s, box-shadow .2s;
+    box-shadow: 0 4px 20px rgba(99,179,237,.25);
+  }
+  .btn-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(99,179,237,.35);
+  }
+  .btn-submit:active { transform: translateY(0); }
+  .btn-submit::after {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,.08), transparent);
+  }
+
+  /* ─── LOADING STATE ──────────────────────────────────────────────── */
+  #loading-section {
+    display: none; text-align: center;
+    animation: fadeIn .4s ease both;
+  }
+  .loader-ring {
+    width: 72px; height: 72px; margin: 0 auto 1.5rem;
+    border-radius: 50%;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent);
+    animation: spin .9s linear infinite;
+  }
+  .loader-text {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.1rem; font-weight: 600; color: var(--text);
+  }
+  .loader-sub {
+    margin-top: .5rem; color: var(--text-muted); font-size: .9rem;
+  }
+  .progress-bar {
+    margin: 1.5rem auto 0;
+    max-width: 260px; height: 4px;
+    background: var(--surface-2);
+    border-radius: 99px; overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%; width: 0%;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    border-radius: 99px;
+    animation: progressAnim 1.8s ease forwards;
+  }
+
+  /* ─── RESULTS SECTION ────────────────────────────────────────────── */
+  #results-section {
+    display: none; width: 100%; max-width: 820px;
+    animation: fadeUp .6s ease both;
+  }
+
+  .results-header {
+    text-align: center; margin-bottom: 2.5rem;
+  }
+  .results-header h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(1.6rem, 3.5vw, 2.4rem);
+    font-weight: 800;
+    background: linear-gradient(135deg, #e2e8f0, var(--accent));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .results-header p { color: var(--text-muted); margin-top: .5rem; font-size: .95rem; }
+
+  .student-recap {
+    display: inline-flex; align-items: center; gap: .5rem;
+    background: rgba(104,211,145,.06);
+    border: 1px solid rgba(104,211,145,.15);
+    border-radius: 99px;
+    padding: .3rem .9rem;
+    font-size: .82rem; color: var(--green);
+    margin-top: .8rem;
+  }
+
+  /* ─── MENTOR CARDS ───────────────────────────────────────────────── */
+  .cards-grid {
+    display: grid; gap: 1.4rem;
+  }
+
+  .mentor-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.6rem;
+    position: relative; overflow: hidden;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 1.4rem;
+    align-items: start;
+    transition: transform .25s, box-shadow .25s, border-color .25s;
+    animation: fadeUp .5s ease both;
+  }
+  .mentor-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 40px rgba(0,0,0,.4);
+    border-color: rgba(99,179,237,.2);
+  }
+  .mentor-card.top-match {
+    border-color: rgba(246,201,14,.25);
+    box-shadow: 0 0 0 1px rgba(246,201,14,.08), var(--shadow);
+  }
+  .mentor-card.top-match:hover {
+    border-color: rgba(246,201,14,.4);
+    box-shadow: 0 0 0 1px rgba(246,201,14,.15), 0 12px 40px rgba(0,0,0,.4);
+  }
+
+  /* top strip */
+  .mentor-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    opacity: 0; transition: opacity .3s;
+  }
+  .mentor-card.top-match::before {
+    background: linear-gradient(90deg, transparent, var(--accent-gold), transparent);
+    opacity: 1;
+  }
+  .mentor-card:hover::before { opacity: 1; }
+
+  @media(max-width: 560px) {
+    .mentor-card { grid-template-columns: auto 1fr; }
+    .score-block { grid-column: 1 / -1; justify-self: start; }
+  }
+
+  /* Avatar */
+  .avatar {
+    width: 68px; height: 68px; border-radius: 50%; flex-shrink: 0;
+    background: linear-gradient(135deg, var(--accent-2), var(--accent));
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Syne', sans-serif;
+    font-size: 1.5rem; font-weight: 800; color: #fff;
+    border: 2px solid rgba(255,255,255,.08);
+    position: relative;
+  }
+  .top-match .avatar { border-color: rgba(246,201,14,.4); }
+
+  .avatar-rank {
+    position: absolute; bottom: -4px; right: -4px;
+    width: 22px; height: 22px; border-radius: 50%;
+    background: var(--bg);
+    border: 2px solid var(--surface);
+    display: flex; align-items: center; justify-content: center;
+    font-size: .65rem; font-weight: 700;
+  }
+  .rank-1 .avatar-rank { background: var(--accent-gold); color: #000; }
+  .rank-2 .avatar-rank { background: #94a3b8; color: #000; }
+  .rank-3 .avatar-rank { background: #b45309; color: #fff; }
+
+  /* Info */
+  .mentor-info { min-width: 0; }
+
+  .mentor-name-row {
+    display: flex; align-items: center; flex-wrap: wrap; gap: .5rem;
+    margin-bottom: .35rem;
+  }
+  .mentor-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.1rem; font-weight: 700; color: var(--text);
+  }
+
+  .badge {
+    display: inline-flex; align-items: center; gap: .3rem;
+    border-radius: 99px; padding: .18rem .65rem;
+    font-size: .7rem; font-weight: 700; letter-spacing: .05em; text-transform: uppercase;
+  }
+  .badge-gold {
+    background: rgba(246,201,14,.12); color: var(--accent-gold);
+    border: 1px solid rgba(246,201,14,.25);
+  }
+  .badge-blue {
+    background: rgba(99,179,237,.1); color: var(--accent);
+    border: 1px solid rgba(99,179,237,.2);
+  }
+
+  .mentor-filiere {
+    font-size: .83rem; color: var(--text-muted);
+    margin-bottom: .9rem;
+    display: flex; align-items: center; gap: .35rem;
+  }
+
+  .stars {
+    display: flex; gap: .15rem; margin-bottom: .9rem;
+  }
+  .star { font-size: .9rem; }
+  .star.filled { color: var(--accent-gold); }
+  .star.empty  { color: var(--text-dim); }
+
+  .match-details { display: flex; flex-direction: column; gap: .7rem; }
+
+  .match-row {
+    display: flex; flex-direction: column; gap: .35rem;
+  }
+  .match-row-label {
+    font-size: .72rem; font-weight: 600; letter-spacing: .07em;
+    text-transform: uppercase; color: var(--text-dim);
+  }
+  .tags { display: flex; flex-wrap: wrap; gap: .35rem; }
+
+  .tag {
+    padding: .25rem .7rem; border-radius: 99px;
+    font-size: .78rem; font-weight: 500;
+  }
+  .tag-green { background: rgba(104,211,145,.1); color: var(--green); border: 1px solid rgba(104,211,145,.2); }
+  .tag-purple { background: rgba(159,122,234,.1); color: var(--accent-2); border: 1px solid rgba(159,122,234,.2); }
+
+  /* Score block */
+  .score-block {
+    display: flex; flex-direction: column; align-items: center; gap: .3rem;
+    min-width: 72px;
+  }
+  .score-circle {
+    width: 64px; height: 64px; border-radius: 50%;
+    background: conic-gradient(var(--accent) var(--pct, 0deg), var(--surface-2) 0deg);
+    display: flex; align-items: center; justify-content: center;
+    position: relative;
+  }
+  .score-circle::before {
+    content: '';
+    position: absolute; inset: 6px; border-radius: 50%;
+    background: var(--surface);
+  }
+  .score-value {
+    position: relative; z-index: 1;
+    font-family: 'Syne', sans-serif;
+    font-size: .95rem; font-weight: 800; color: var(--accent);
+  }
+  .top-match .score-circle { background: conic-gradient(var(--accent-gold) var(--pct, 0deg), var(--surface-2) 0deg); }
+  .top-match .score-value { color: var(--accent-gold); }
+
+  .score-label {
+    font-size: .68rem; font-weight: 500; color: var(--text-dim);
+    text-transform: uppercase; letter-spacing: .06em;
+  }
+
+  /* ─── NO RESULTS ─────────────────────────────────────────────────── */
+  .no-results {
+    text-align: center; padding: 3rem 1.5rem;
+  }
+  .no-results .emoji { font-size: 3.5rem; margin-bottom: 1rem; }
+  .no-results h3 { font-family: 'Syne', sans-serif; font-size: 1.2rem; margin-bottom: .5rem; }
+  .no-results p { color: var(--text-muted); }
+
+  /* ─── RESET BUTTON ───────────────────────────────────────────────── */
+  .btn-reset {
+    display: inline-flex; align-items: center; gap: .5rem;
+    margin-top: 2rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: .7rem 1.4rem;
+    color: var(--text-muted);
+    font-family: 'DM Sans', sans-serif;
+    font-size: .9rem; cursor: pointer;
+    transition: border-color .2s, color .2s;
+  }
+  .btn-reset:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ─── ANIMATIONS ─────────────────────────────────────────────────── */
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; } to { opacity: 1; }
+  }
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+  @keyframes pulse {
+    0%,100% { opacity: 1; transform: scale(1); }
+    50%      { opacity: .6; transform: scale(.85); }
+  }
+  @keyframes progressAnim {
+    from { width: 0%; } to { width: 100%; }
+  }
+  @keyframes cardIn {
+    from { opacity: 0; transform: translateY(20px) scale(.98); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  /* ─── FOOTER ─────────────────────────────────────────────────────── */
+  footer {
+    position: relative; z-index: 1;
+    text-align: center; color: var(--text-dim);
+    font-size: .78rem; padding-bottom: 2rem; margin-top: 3rem;
+  }
+  footer span { color: var(--accent); }
+</style>
+</head>
+<body>
+
+<!-- DECORATIVE BACKGROUND -->
+<div class="grid-bg"></div>
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="orb orb-3"></div>
+
+<div class="wrapper">
+
+  <!-- ── HEADER ── -->
+  <header>
+    <div class="logo-badge"><span class="dot"></span>Plateforme de Mentorat Académique</div>
+    <h1>Trouve ton Mentor<br>Idéal en Secondes</h1>
+    <p class="subtitle">Un algorithme de matching intelligent analyse ton profil et te connecte avec le mentor qui te correspond le mieux.</p>
+  </header>
+
+  <!-- STEP INDICATOR -->
+  <div class="steps" id="steps">
+    <div class="step active" id="step-1">
+      <div class="step-num">1</div>
+      <span>Ton profil</span>
+    </div>
+    <div class="step-line"></div>
+    <div class="step" id="step-2">
+      <div class="step-num">2</div>
+      <span>Analyse</span>
+    </div>
+    <div class="step-line"></div>
+    <div class="step" id="step-3">
+      <div class="step-num">3</div>
+      <span>Résultats</span>
+    </div>
+  </div>
+
+  <!-- ══ FORM SECTION ══ -->
+  <section id="form-section">
+    <div class="card form-card">
+
+      <!-- Identité -->
+      <div class="section-title">
+        <span class="icon">👤</span> Informations personnelles
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label for="name">Nom complet</label>
+          <input type="text" id="name" placeholder="Ex : Kofi Mensah" />
+        </div>
+        <div class="field">
+          <label for="filiere">Filière</label>
+          <select id="filiere">
+            <option value="">— Choisir —</option>
+            <option value="Informatique">Informatique</option>
+            <option value="Mathématiques">Mathématiques</option>
+            <option value="Physique">Physique</option>
+            <option value="Économie">Économie</option>
+            <option value="Biologie">Biologie</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- Lacunes -->
+      <div class="section-title">
+        <span class="icon">📚</span> Mes lacunes — matières où j'ai besoin d'aide
+      </div>
+      <div class="field">
+        <div class="checkbox-grid" id="lacunes-grid">
+          <!-- injected by JS -->
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- Disponibilités -->
+      <div class="section-title">
+        <span class="icon">🕐</span> Mes disponibilités
+      </div>
+      <div class="field">
+        <div class="chips-grid" id="dispos-grid">
+          <!-- injected by JS -->
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- Submit -->
+      <button class="btn-submit" id="btn-submit" onclick="handleSubmit()">
+        ✦ &nbsp;S'inscrire &amp; trouver mon mentor
+      </button>
+    </div>
+  </section>
+
+  <!-- ══ LOADING ══ -->
+  <section id="loading-section">
+    <div class="loader-ring"></div>
+    <div class="loader-text">Analyse en cours…</div>
+    <div class="loader-sub">Comparaison de 8 profils mentors</div>
+    <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+  </section>
+
+  <!-- ══ RESULTS ══ -->
+  <section id="results-section">
+    <div class="results-header">
+      <h2>Tes Mentors Recommandés</h2>
+      <p>Classés par pertinence — le meilleur match en tête de liste</p>
+      <div class="student-recap" id="student-recap"></div>
+    </div>
+    <div class="cards-grid" id="cards-grid"></div>
+    <div style="text-align:center">
+      <button class="btn-reset" onclick="resetForm()">← Modifier mon profil</button>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  MentorMatch &nbsp;·&nbsp; Propulsé par <span>IA de matching</span> &nbsp;·&nbsp; © 2025
+</footer>
+
+<!-- ════════════════════════ JAVASCRIPT ════════════════════════ -->
+<script>
+/* ─── STATIC DATA ────────────────────────────────────────────────── */
+
+const MATIERES = [
+  "Algorithmique", "Structures de données", "Base de données",
+  "Réseaux", "Statistiques", "Analyse", "Algèbre",
+  "Programmation Python", "Thermodynamique", "Électromagnétisme",
+  "Microéconomie", "Finance", "Biochimie", "Génétique"
+];
+
+const DISPOS = [
+  "Lun Matin", "Lun Après-midi", "Mar Matin", "Mar Soir",
+  "Mer Après-midi", "Jeu Matin", "Ven Matin", "Ven Soir",
+  "Sam Matin", "Sam Après-midi", "Dim Après-midi"
+];
+
+const MENTORS = [
+  {
+    id: 1,
+    nom: "Amara Touré",
+    filiere: "Informatique",
+    initiales: "AT",
+    matieres_maitrisees: ["Algorithmique", "Structures de données", "Programmation Python", "Base de données"],
+    disponibilites: ["Lun Matin", "Mer Après-midi", "Sam Matin", "Sam Après-midi"],
+    note: 4.8,
+    couleur: "linear-gradient(135deg,#1d4ed8,#06b6d4)"
+  },
+  {
+    id: 2,
+    nom: "Fatou Diallo",
+    filiere: "Mathématiques",
+    initiales: "FD",
+    matieres_maitrisees: ["Statistiques", "Analyse", "Algèbre", "Microéconomie"],
+    disponibilites: ["Mar Matin", "Mar Soir", "Jeu Matin", "Ven Matin"],
+    note: 4.6,
+    couleur: "linear-gradient(135deg,#7c3aed,#db2777)"
+  },
+  {
+    id: 3,
+    nom: "Kwame Asante",
+    filiere: "Informatique",
+    initiales: "KA",
+    matieres_maitrisees: ["Réseaux", "Base de données", "Algorithmique", "Structures de données"],
+    disponibilites: ["Lun Matin", "Lun Après-midi", "Ven Soir", "Sam Matin"],
+    note: 4.4,
+    couleur: "linear-gradient(135deg,#059669,#0ea5e9)"
+  },
+  {
+    id: 4,
+    nom: "Léa Konan",
+    filiere: "Physique",
+    initiales: "LK",
+    matieres_maitrisees: ["Thermodynamique", "Électromagnétisme", "Analyse", "Statistiques"],
+    disponibilites: ["Mar Soir", "Mer Après-midi", "Sam Après-midi", "Dim Après-midi"],
+    note: 4.7,
+    couleur: "linear-gradient(135deg,#d97706,#f97316)"
+  },
+  {
+    id: 5,
+    nom: "Cheikh Ndiaye",
+    filiere: "Économie",
+    initiales: "CN",
+    matieres_maitrisees: ["Finance", "Microéconomie", "Statistiques", "Algèbre"],
+    disponibilites: ["Lun Après-midi", "Jeu Matin", "Ven Matin", "Ven Soir"],
+    note: 4.5,
+    couleur: "linear-gradient(135deg,#0891b2,#6366f1)"
+  },
+  {
+    id: 6,
+    nom: "Nia Osei",
+    filiere: "Biologie",
+    initiales: "NO",
+    matieres_maitrisees: ["Biochimie", "Génétique", "Statistiques", "Thermodynamique"],
+    disponibilites: ["Sam Matin", "Sam Après-midi", "Dim Après-midi", "Ven Soir"],
+    note: 4.3,
+    couleur: "linear-gradient(135deg,#16a34a,#0d9488)"
+  },
+  {
+    id: 7,
+    nom: "Ibrahim Balde",
+    filiere: "Informatique",
+    initiales: "IB",
+    matieres_maitrisees: ["Programmation Python", "Algorithmique", "Statistiques", "Réseaux"],
+    disponibilites: ["Mar Matin", "Mer Après-midi", "Ven Matin", "Sam Matin"],
+    note: 4.9,
+    couleur: "linear-gradient(135deg,#1e40af,#7c3aed)"
+  },
+  {
+    id: 8,
+    nom: "Mariama Sow",
+    filiere: "Mathématiques",
+    initiales: "MS",
+    matieres_maitrisees: ["Algèbre", "Analyse", "Statistiques", "Finance"],
+    disponibilites: ["Lun Matin", "Lun Après-midi", "Mar Soir", "Jeu Matin"],
+    note: 4.6,
+    couleur: "linear-gradient(135deg,#be123c,#9f1239)"
+  }
+];
+
+/* ─── BUILD FORM ELEMENTS ────────────────────────────────────────── */
+document.addEventListener('DOMContentLoaded', () => {
+  const lacGrid = document.getElementById('lacunes-grid');
+  MATIERES.forEach(m => {
+    lacGrid.innerHTML += `
+      <label class="cb-item">
+        <input type="checkbox" name="lacune" value="${m}">
+        <span class="cb-box">✓</span>
+        <span class="cb-label">${m}</span>
+      </label>`;
+  });
+
+  const disGrid = document.getElementById('dispos-grid');
+  DISPOS.forEach(d => {
+    disGrid.innerHTML += `
+      <label class="chip" onclick="toggleChip(this)">
+        <input type="checkbox" name="dispo" value="${d}">
+        ${d}
+      </label>`;
+  });
+});
+
+function toggleChip(el) {
+  const cb = el.querySelector('input');
+  // toggle happens after click (before this fires), so we read new state:
+  el.classList.toggle('selected', cb.checked);
+}
+
+/* ─── MATCHING ALGORITHM ─────────────────────────────────────────── */
+function computeMatches(student) {
+  const results = [];
+
+  MENTORS.forEach(mentor => {
+    const communMatieres = mentor.matieres_maitrisees.filter(m =>
+      student.lacunes.includes(m)
+    );
+    if (communMatieres.length === 0) return; // eliminer
+
+    let score = communMatieres.length * 10;                     // +10/matière
+    if (mentor.filiere === student.filiere) score += 5;         // +5 même filière
+
+    const communDispos = mentor.disponibilites.filter(d =>
+      student.disponibilites.includes(d)
+    );
+    score += communDispos.length * 2;                           // +2/créneau
+
+    results.push({ ...mentor, score, communMatieres, communDispos });
+  });
+
+  results.sort((a, b) => b.score - a.score);
+  return results;
+}
+
+/* ─── FORM HANDLER ───────────────────────────────────────────────── */
+function handleSubmit() {
+  const name   = document.getElementById('name').value.trim();
+  const filiere = document.getElementById('filiere').value;
+  const lacunes = [...document.querySelectorAll('input[name="lacune"]:checked')].map(c => c.value);
+  const dispos  = [...document.querySelectorAll('input[name="dispo"]:checked')].map(c => c.value);
+
+  // Basic validation
+  if (!name) { shake('name'); showAlert('Merci d\'entrer ton nom.'); return; }
+  if (!filiere) { showAlert('Sélectionne ta filière.'); return; }
+  if (lacunes.length === 0) { showAlert('Coche au moins une matière où tu as besoin d\'aide.'); return; }
+  if (dispos.length === 0) { showAlert('Sélectionne au moins un créneau de disponibilité.'); return; }
+
+  const student = { name, filiere, lacunes, disponibilites: dispos };
+
+  // Update steps
+  document.getElementById('step-1').classList.remove('active');
+  document.getElementById('step-1').classList.add('done');
+  document.getElementById('step-2').classList.add('active');
+
+  // Show loading
+  document.getElementById('form-section').style.display = 'none';
+  const loading = document.getElementById('loading-section');
+  loading.style.display = 'block';
+
+  // Reset & restart progress bar animation
+  const fill = document.getElementById('progress-fill');
+  fill.style.animation = 'none';
+  fill.offsetHeight; // reflow
+  fill.style.animation = '';
+
+  // Simulate processing delay then show results
+  setTimeout(() => {
+    loading.style.display = 'none';
+    document.getElementById('step-2').classList.remove('active');
+    document.getElementById('step-2').classList.add('done');
+    document.getElementById('step-3').classList.add('active');
+    displayResults(student, computeMatches(student));
+  }, 1900);
+}
+
+/* ─── RENDER RESULTS ─────────────────────────────────────────────── */
+function displayResults(student, matches) {
+  const section = document.getElementById('results-section');
+  const grid    = document.getElementById('cards-grid');
+  const recap   = document.getElementById('student-recap');
+
+  recap.innerHTML = `✓ ${student.name} · ${student.filiere} · ${student.lacunes.length} matière(s) · ${student.disponibilites.length} créneau(x)`;
+
+  grid.innerHTML = '';
+
+  if (matches.length === 0) {
+    grid.innerHTML = `
+      <div class="no-results">
+        <div class="emoji">🔍</div>
+        <h3>Aucun mentor compatible trouvé</h3>
+        <p>Essaie d'élargir tes lacunes ou tes disponibilités pour trouver un match.</p>
+      </div>`;
+  } else {
+    const maxScore = matches[0].score;
+
+    matches.forEach((m, i) => {
+      const pct = Math.round((m.score / (maxScore * 1.05)) * 100);
+      const angle = Math.round(pct / 100 * 360);
+      const rankClass = i === 0 ? 'rank-1' : i === 1 ? 'rank-2' : i === 2 ? 'rank-3' : '';
+      const isTop = i === 0;
+
+      const badge = isTop
+        ? `<span class="badge badge-gold">⭐ Meilleur Match</span>`
+        : pct >= 80
+          ? `<span class="badge badge-blue">Recommandé à ${pct}%</span>`
+          : '';
+
+      const stars = renderStars(m.note);
+      const matTags = m.communMatieres.map(t => `<span class="tag tag-green">${t}</span>`).join('');
+      const disTags = m.communDispos.length > 0
+        ? m.communDispos.map(t => `<span class="tag tag-purple">${t}</span>`).join('')
+        : `<span style="color:var(--text-dim);font-size:.8rem">Aucun créneau commun détecté</span>`;
+
+      const card = document.createElement('div');
+      card.className = `mentor-card ${isTop ? 'top-match' : ''} ${rankClass}`;
+      card.style.animationDelay = `${i * 0.1}s`;
+      card.style.animation = `cardIn .5s ${i * 0.1}s ease both`;
+      card.innerHTML = `
+        <div class="avatar" style="background:${m.couleur}">
+          ${m.initiales}
+          <div class="avatar-rank">${i+1}</div>
+        </div>
+        <div class="mentor-info">
+          <div class="mentor-name-row">
+            <span class="mentor-name">${m.nom}</span>
+            ${badge}
+          </div>
+          <div class="mentor-filiere">
+            📖 ${m.filiere}
+            ${m.filiere === student.filiere ? ' <span style="color:var(--green);font-size:.75rem">· Même filière +5pts</span>' : ''}
+          </div>
+          <div class="stars">${stars}</div>
+          <div class="match-details">
+            <div class="match-row">
+              <span class="match-row-label">📌 Matières en commun (${m.communMatieres.length})</span>
+              <div class="tags">${matTags}</div>
+            </div>
+            <div class="match-row">
+              <span class="match-row-label">🕐 Créneaux en commun (${m.communDispos.length})</span>
+              <div class="tags">${disTags}</div>
+            </div>
+          </div>
+        </div>
+        <div class="score-block">
+          <div class="score-circle" style="--pct:${angle}deg">
+            <span class="score-value">${m.score}</span>
+          </div>
+          <span class="score-label">Score</span>
+        </div>
+      `;
+      grid.appendChild(card);
+    });
+  }
+
+  section.style.display = 'block';
+}
+
+function renderStars(note) {
+  let html = '';
+  for (let i = 1; i <= 5; i++) {
+    html += `<span class="star ${i <= Math.round(note) ? 'filled' : 'empty'}">★</span>`;
+  }
+  return html + `<span style="font-size:.8rem;color:var(--text-muted);margin-left:.4rem">${note}</span>`;
+}
+
+/* ─── RESET ──────────────────────────────────────────────────────── */
+function resetForm() {
+  document.getElementById('results-section').style.display = 'none';
+  document.getElementById('form-section').style.display = 'block';
+  ['step-1','step-2','step-3'].forEach(s => {
+    document.getElementById(s).classList.remove('active','done');
+  });
+  document.getElementById('step-1').classList.add('active');
+}
+
+/* ─── HELPERS ────────────────────────────────────────────────────── */
+function shake(id) {
+  const el = document.getElementById(id);
+  el.style.animation = 'none'; el.offsetHeight;
+  el.style.animation = 'shakeX .4s ease';
+}
+function showAlert(msg) {
+  // Simple toast notification
+  const toast = document.createElement('div');
+  toast.textContent = msg;
+  Object.assign(toast.style, {
+    position:'fixed', bottom:'2rem', left:'50%', transform:'translateX(-50%)',
+    background:'#1a202c', border:'1px solid rgba(252,129,129,.3)',
+    color:'#fc8181', padding:'.75rem 1.4rem', borderRadius:'8px',
+    fontSize:'.88rem', zIndex:'999', boxShadow:'0 8px 24px rgba(0,0,0,.5)',
+    animation:'fadeUp .3s ease', fontFamily:'DM Sans, sans-serif'
+  });
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 3200);
+}
+</script>
+</body>
+</html>
