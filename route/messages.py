@@ -1,3 +1,68 @@
+import socket
+import threading
+
+IP = "127.0.0.1"
+PORT = 55555
+
+server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server.bind((IP, PORT))  # tuple obligatoire
+server.listen(1000)
+
+clients = []
+pseudos = []
+
+
+def diffuser(message):
+    for client in clients:
+        client.send(bytes(message, "utf-8"))
+
+
+def gestion_connexions():
+    while True:
+        client, adresse = server.accept()
+        print(f"Connexion établie avec {str(adresse)}")
+
+        pseudo = client.recv(1024).decode("utf-8")
+
+        clients.append(client)   # clients, pas client
+        pseudos.append(pseudo)
+
+        print(f"{pseudo} a rejoint le chat")
+        client.send(bytes("Bienvenue dans le chat !\n", "utf-8"))
+        diffuser(f"{pseudo} a rejoint le chat")
+
+        thread_client = threading.Thread(target=gestion_client, args=(client, pseudo))
+        thread_client.start()
+
+
+def gestion_client(client, pseudo):
+    while True:
+        try:
+            message = client.recv(1024).decode("utf-8")  # recv, pas rcv
+
+            if message == "exit":
+                index = clients.index(client)
+                pseudo_depart = pseudos[index]   # pseudos[index], pas pseudo[index]
+                clients.remove(client)
+                pseudos.remove(pseudo_depart)
+                client.close()
+                diffuser(f"{pseudo_depart} a quitté la discussion")
+                break
+            else:
+                diffuser(f"{pseudo} : {message}")
+
+        except:
+            index = clients.index(client)
+            pseudo_depart = pseudos[index]
+            clients.remove(client)
+            pseudos.remove(pseudo_depart)
+            client.close()
+            diffuser(f"{pseudo_depart} a quitté la discussion")
+            break
+
+
+print("Le serveur est en marche...")
+gestion_connexions()
 # ================================================================
 # IFRI MentorLink - Module Messagerie
 # Fichier : messagerie/messages.py
