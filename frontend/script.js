@@ -1,4 +1,3 @@
-// Version simple et fonctionnelle
 function basculer(onglet) {
     // Cacher les deux sections
     document.getElementById('connexion').style.display = 'none';
@@ -36,7 +35,7 @@ function connecter() {
         return;
     }
     
-    // Envoi au backend Django
+    // li sa au backend Django
     fetch('http://127.0.0.1:8001/api/connexion/', {
         method: 'POST',
         headers: {
