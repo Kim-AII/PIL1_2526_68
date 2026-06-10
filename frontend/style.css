@@ -1,7 +1,4 @@
-/* ============================================
-   VARIABLES CSS — Les couleurs et polices
-   utilisées partout dans la page
-============================================ */
+
 :root {
     --vert-principal: #075E54;
     --vert-clair: #25D366;
@@ -14,19 +11,13 @@
     --police-corps: 'DM Sans', sans-serif;
 }
 
-/* ============================================
-   RESET — Supprime les marges par défaut
-   du navigateur
-============================================ */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
-/* ============================================
-   BODY — Le fond de toute la page
-============================================ */
+/* BODY — Le fond de toute la page */
 body {
     font-family: var(--police-corps);
     background-color: var(--gris-clair);
@@ -38,9 +29,7 @@ body {
     padding: 20px 0;
 }
 
-/* ============================================
-   FOND DÉCORATIF — Les cercles en arrière-plan
-============================================ */
+/* FOND DÉCORATIF — Les cercles en arrière-plan */
 .fond-decoration {
     position: fixed;
     top: 0;
@@ -78,9 +67,7 @@ body {
     50% { transform: scale(1.1); opacity: 1; }
 }
 
-/* ============================================
-   CONTENEUR PRINCIPAL — La carte blanche
-============================================ */
+/* CONTENEUR PRINCIPAL — La carte blanche */
 .conteneur {
     position: relative;
     z-index: 1;
@@ -105,9 +92,7 @@ body {
     }
 }
 
-/* ============================================
-   EN-TÊTE
-============================================ */
+/* EN-TÊTE */
 .entete {
     background: linear-gradient(135deg, #1A1A2E, #2d2d2d);
     padding: 40px 40px 30px;
@@ -154,9 +139,7 @@ body {
     font-weight: 300;
 }
 
-/* ============================================
-   ONGLETS
-============================================ */
+/* ONGLETS */
 .onglets {
     display: flex;
     margin: 20px 40px 0;
@@ -187,9 +170,7 @@ body {
     box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
 
-/* ============================================
-   CORPS DU FORMULAIRE
-============================================ */
+/* CORPS DU FORMULAIRE */
 .corps {
     padding: 24px 40px 40px;
 }
@@ -208,9 +189,7 @@ body {
     to { opacity: 1; transform: translateX(0); }
 }
 
-/* ============================================
-   GROUPES DE CHAMPS
-============================================ */
+/* GROUPES DE CHAMPS */
 .groupe-champ {
     margin-bottom: 18px;
 }
@@ -251,18 +230,14 @@ body {
     box-shadow: 0 0 0 4px rgba(26,26,46,0.1);
 }
 
-/* ============================================
-   LIGNE DOUBLE
-============================================ */
+/* LIGNE DOUBLE */
 .ligne-double {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 12px;
 }
 
-/* ============================================
-   BOUTON PRINCIPAL
-============================================ */
+/* BOUTON PRINCIPAL */
 .bouton-principal {
     width: 100%;
     padding: 14px;
@@ -288,9 +263,7 @@ body {
     transform: translateY(0);
 }
 
-/* ============================================
-   SÉPARATEUR
-============================================ */
+/* SÉPARATEUR */
 .separateur {
     display: flex;
     align-items: center;
@@ -308,9 +281,7 @@ body {
     background: #E8ECF0;
 }
 
-/* ============================================
-   MESSAGE D'ERREUR
-============================================ */
+/* MESSAGE D'ERREUR */
 .message-erreur {
     background: #FFF0F0;
     border: 1px solid #FFB3B3;
@@ -322,9 +293,7 @@ body {
     display: none;
 }
 
-/* ============================================
-   LIEN MOT DE PASSE OUBLIÉ
-============================================ */
+/* LIEN MOT DE PASSE OUBLIÉ */
 .lien-oubli {
     text-align: right;
     margin-top: -10px;
@@ -342,9 +311,7 @@ body {
     text-decoration: underline;
 }
 
-/* ============================================
-   PIED DE PAGE DE LA CARTE
-============================================ */
+/* PIED DE PAGE DE LA CARTE */
 .pied-carte {
     text-align: center;
     padding: 0 40px 30px;
@@ -379,9 +346,7 @@ body {
     border-radius: 50%;
 }
 
-/* ============================================
-   SÉLECTEUR
-============================================ */
+/* SÉLECTEUR */
 .champ-avec-icone select {
     width: 100%;
     padding: 13px 14px;
@@ -403,9 +368,7 @@ body {
     box-shadow: 0 0 0 4px rgba(26,26,46,0.1);
 }
 
-/* ============================================
-   RESPONSIVE
-============================================ */
+/* RESPONSIVE */
 @media (max-width: 480px) {
     .conteneur {
         margin: 10px;
